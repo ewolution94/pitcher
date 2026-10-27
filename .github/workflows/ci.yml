@@ -1,0 +1,71 @@
+name: CI
+
+# Runs on pull requests, and is the gate docker-publish.yml calls before it publishes
+# anything, so the checks guarding a PR and the checks guarding a deploy can't drift apart.
+on:
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: Typecheck, test, build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Matches the Dockerfile.
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run check
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # The built page served by the real production server. Nothing here talks to YouTube: the
+      # relay is checked only for what it refuses.
+      - name: Smoke test the production server
+        run: |
+          PORT=7299 node server/server.mjs &
+          server=$!
+          for _ in $(seq 1 20); do curl -sf http://127.0.0.1:7299/healthz && break; sleep 0.5; done
+          curl -sf http://127.0.0.1:7299/ | grep -q '<title>Pitcher</title>'
+          curl -sf http://127.0.0.1:7299/watch | grep -q '<title>Pitcher</title>'
+          curl -sI http://127.0.0.1:7299/ | grep -qi "content-security-policy: default-src 'self'"
+          curl -sI http://127.0.0.1:7299/ | grep -qi "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' blob:"
+          curl -sI http://127.0.0.1:7299/ | grep -qi "cache-control: no-cache"
+          curl -sf http://127.0.0.1:7299/manifest.webmanifest | grep -q '"name": "Pitcher"'
+          curl -sf -o /dev/null http://127.0.0.1:7299/sw.js
+          curl -sf -o /dev/null http://127.0.0.1:7299/icon.svg
+          curl -sf -o /dev/null http://127.0.0.1:7299/icons/apple-touch-icon.png
+          curl -sf -o /dev/null http://127.0.0.1:7299/splash/dark-1170x2532.png
+          asset=$(curl -s http://127.0.0.1:7299/ | grep -o '/assets/[^"]*\.js' | head -1)
+          curl -sI "http://127.0.0.1:7299$asset" | grep -qi 'cache-control: public, max-age=31536000, immutable'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:7299/assets/missing.js)" = 404
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:7299/)" = 405
+          # The relay: only YouTube's hosts, never a credential, never another port.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:7299/relay/example.com/)" = 403
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:7299/relay/census:4901/_e)" = 403
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:7299/relay/www.youtube.com/)" = 405
+          curl -sI http://127.0.0.1:7299/relay/example.com/ | grep -qi 'x-pitcher-relay: error'
+          # The Census forwarder is wired in; without PITCHER_CENSUS it answers locally.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:7299/_e.js)" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST --data '{}' http://127.0.0.1:7299/_e)" = 204
+          kill $server
+          wait $server || true

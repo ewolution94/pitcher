@@ -1,0 +1,146 @@
+/* Folio's shared tokens and fonts (vendor/ewo, from `npm run vendor -- pitcher` in Folio), and
+   Archivo, Pitcher's own face: wide for the big numbers, narrow for the labels. Monochrome on
+   Folio's neutrals; amber is the CDJ's readout colour and marks what's on, blue is the waveform's
+   lows (Rekordbox's three-band colours). */
+@import '../vendor/ewo/tokens/index.css';
+@import '../vendor/ewo/tokens/base.css';
+@import '@fontsource-variable/archivo/standard.css';
+
+:root {
+  --font: 'Archivo Variable', var(--ewo-sans);
+  /* Amber as a fill (on, the target, the needle), the ink on it, and amber as text. */
+  --amber: light-dark(#ec930f, #f2a33a);
+  --amber-ink: #1a1206;
+  --amber-text: light-dark(#8f5200, #f2a33a);
+  --amber-soft: light-dark(rgb(236 147 15 / 0.16), rgb(242 163 58 / 0.16));
+  /* The waveform's bands, its well, and the grid over it. */
+  --low: light-dark(#2d63e0, #3d7dff);
+  --mid: light-dark(#ec930f, #f2a33a);
+  --high: light-dark(#33373d, #f4f1ea);
+  --well: light-dark(#e7e6e1, #050506);
+  --grid: light-dark(rgb(16 18 20 / 0.1), rgb(255 255 255 / 0.12));
+  --grid-bar: light-dark(rgb(16 18 20 / 0.3), rgb(255 255 255 / 0.34));
+  --dot: light-dark(rgb(16 18 20 / 0.28), rgb(255 255 255 / 0.3));
+  --big: light-dark(var(--ewo-fg), #f2a33a);
+}
+
+/* Two quick taps on a control must not zoom the page: iOS Safari's double-tap zoom also made
+   sticky headers look stuck mid-page (learnings/ios-and-webkit.md, 2026-10-08). On the controls,
+   not <html>, which Safari ignores once it has an overflow. Zero specificity, so a component's own
+   touch-action still wins. */
+:where(button, a, label, summary, input, select, textarea, [role='button'], [role='radio']) {
+  touch-action: manipulation;
+}
+
+html {
+  overflow-x: clip;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+img {
+  display: block;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+/* iOS zooms the page into any field under 16px. The big tempo field is far above it. */
+@media (hover: none) {
+  input:not(.bpm),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Small caps labels: Archivo's narrow cut, like the labels on a deck. */
+.label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 650;
+  font-stretch: 82%;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ewo-fg-3);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The deck's buttons: plain, hardware-like rectangles; on is amber. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 7px;
+  border: 1px solid var(--ewo-line);
+  background: var(--ewo-bg-raised);
+  color: var(--ewo-fg);
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn:hover {
+  border-color: var(--ewo-line-strong);
+}
+
+.btn.on {
+  border-color: var(--amber);
+  color: var(--amber-text);
+  background: var(--amber-soft);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ewo-fg-3);
+}
+
+.on > .led {
+  background: var(--amber);
+}
+
+.blink > .led {
+  box-shadow: 0 0 8px 2px var(--amber);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ewo-focus, var(--amber));
+  outline-offset: 2px;
+}
