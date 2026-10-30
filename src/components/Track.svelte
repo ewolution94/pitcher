@@ -1,6 +1,7 @@
 <!--
   What's on the deck: the picture (a file's tile for a file), the title and the channel, and what the
-  analysis found (Detected).
+  analysis found (Detected). On a desktop it's the deck's headline: a big cover, a big bold title; on a
+  phone a compact row.
 -->
 <script lang="ts">
   import FileMusic from '@lucide/svelte/icons/file-music';
@@ -65,6 +66,59 @@
 
   .end {
     margin-left: auto;
+  }
+
+  @media (min-width: 760px) {
+    .track {
+      gap: 18px;
+    }
+
+    /* Detected keeps its two lines; the title gives way. */
+    .end {
+      flex: none;
+    }
+
+    .thumb {
+      width: 120px;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgb(0 0 0 / 0.3), 0 0 0 1px var(--ewo-line);
+    }
+
+    .file :global(svg) {
+      width: 28px;
+      height: 28px;
+    }
+
+    .title {
+      gap: 4px;
+    }
+
+    .title b {
+      font-size: 26px;
+      font-weight: 750;
+      font-stretch: 106%;
+      letter-spacing: -0.012em;
+      line-height: 1.15;
+    }
+
+    .title span {
+      font-size: 15px;
+      font-weight: 550;
+    }
+  }
+
+  @media (min-width: 760px) and (max-height: 760px) {
+    .thumb {
+      width: 100px;
+    }
+
+    .title b {
+      font-size: 22px;
+    }
+
+    .title span {
+      font-size: 14px;
+    }
   }
 
   @media (max-width: 759.98px) {

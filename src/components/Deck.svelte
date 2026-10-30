@@ -68,7 +68,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     /* The stage grows with the screen, to a cap: past it the deck keeps its size, at the top. */
-    grid-template-rows: 56px auto minmax(200px, 54vh) auto 112px;
+    grid-template-rows: 100px auto minmax(200px, 54vh) auto 112px;
     align-content: start;
     height: calc(100dvh - var(--ewo-bar-h));
     min-height: 600px;
@@ -125,7 +125,7 @@
 
   @media (max-height: 760px) and (min-width: 760px) {
     .deck {
-      grid-template-rows: 52px auto minmax(160px, 1fr) auto 92px;
+      grid-template-rows: 80px auto minmax(160px, 1fr) auto 92px;
     }
 
     .rule {

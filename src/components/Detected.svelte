@@ -173,6 +173,44 @@
     cursor: pointer;
   }
 
+  /* A desktop: like the stage's readouts, the label on a line of its own, the values bigger under it. */
+  @media (min-width: 760px) {
+    .detected {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px 16px;
+    }
+
+    .label {
+      flex-basis: 100%;
+      text-align: right;
+    }
+
+    .bpm input {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .unit {
+      font-size: 13px;
+    }
+
+    .half button {
+      min-width: 30px;
+      height: 26px;
+      font-size: 13px;
+    }
+
+    .key b {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .key .code {
+      font-size: 14px;
+    }
+  }
+
   /* A narrow screen: the parts wrap rather than push the page wider than the screen. */
   @media (max-width: 759.98px) {
     .detected {
