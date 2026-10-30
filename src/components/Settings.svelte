@@ -30,6 +30,7 @@
     [['L'], 'keys.loop'],
     [['H'], 'keys.hook'],
     [['O'], 'keys.hold'],
+    [['−', '+'], 'keys.zoom'],
     [['[', ']'], 'keys.nudge'],
     [['T'], 'keys.tap'],
     [['/'], 'keys.link'],

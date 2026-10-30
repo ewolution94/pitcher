@@ -2,11 +2,13 @@
   The waveform, as a deck shows it: the lows, mids and highs in their own colours, scrolling past a
   fixed playhead with the beat grid and bar numbers over it (drag it to jog), and the whole track
   below, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
-  drag to jump).
+  drag to jump). The zoom is in pixels per beat, so a wider screen shows more bars rather than bigger
+  ones; ⌘ + scroll (or pinch) on the waveform, and − and +, change it.
 -->
 <script lang="ts">
   import { barLength, beatLength } from '../lib/analysis/tempo.ts';
   import { t } from '../lib/i18n/index.svelte.ts';
+  import { prefs, ZOOM, zoomBy } from '../lib/prefs.svelte.ts';
   import { colours, type Palette } from '../lib/palette.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
@@ -14,8 +16,37 @@
   let over: HTMLCanvasElement | undefined = $state();
   let zw = $state(0), zh = $state(0), ow = $state(0), oh = $state(0);
 
-  /** Seconds across the scrolling view: about 150 px a second, 3 to 9 s. */
-  const span = $derived(Math.max(3, Math.min(9, zw / 150)));
+  /** Seconds across the scrolling view, from the zoom's pixels per beat. */
+  const span = $derived(zw / ((ZOOM[prefs.zoom] ?? ZOOM[2]) * (session.srcBpm / 60)));
+  const bars = $derived(Math.max(1, Math.round(span / barLength(session.srcBpm))));
+
+  // After a zoom, how many bars are on screen now, for a moment.
+  let zoomNote = $state(false);
+  let lastZoom = prefs.zoom;
+  $effect(() => {
+    if (prefs.zoom === lastZoom) return;
+    lastZoom = prefs.zoom;
+    zoomNote = true;
+    const timer = setTimeout(() => (zoomNote = false), 1200);
+    return () => clearTimeout(timer);
+  });
+
+  // ⌘ + scroll (or a trackpad pinch, which arrives with Ctrl) zooms; plain scrolling still scrolls.
+  $effect(() => {
+    if (!zoom) return;
+    const canvas = zoom;
+    let acc = 0;
+    const wheel = (event: WheelEvent) => {
+      if (!event.metaKey && !event.ctrlKey) return;
+      event.preventDefault();
+      acc += event.deltaY;
+      if (Math.abs(acc) < 40) return;
+      zoomBy(acc < 0 ? 1 : -1);
+      acc = 0;
+    };
+    canvas.addEventListener('wheel', wheel, { passive: false });
+    return () => canvas.removeEventListener('wheel', wheel);
+  });
 
   function prepare(canvas: HTMLCanvasElement, w: number, h: number) {
     const ratio = Math.min(2, devicePixelRatio || 1);
@@ -222,6 +253,7 @@
     onpointercancel={() => ((jog = null), (grabbing = false))}
   ></canvas>
   {#if session.orig}<span class="badge">{t('transport.original')}</span>{/if}
+  <span class="zoomed" class:shown={zoomNote} aria-live="polite">{zoomNote ? t('wave.zoom', { count: bars }) : ''}</span>
 </div>
 <div class="over" bind:clientWidth={ow} bind:clientHeight={oh}>
   <canvas
@@ -274,6 +306,26 @@
 
   .over canvas {
     cursor: pointer;
+  }
+
+  .zoomed {
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--ewo-bg-raised);
+    color: var(--ewo-fg-2);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .zoomed.shown {
+    opacity: 1;
   }
 
   .badge {

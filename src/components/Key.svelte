@@ -93,7 +93,8 @@
   }
 
   .wheel {
-    width: min(210px, 100%);
+    /* Bigger on a taller screen. */
+    width: min(clamp(210px, 24vh, 320px), 100%);
     aspect-ratio: 1;
   }
 

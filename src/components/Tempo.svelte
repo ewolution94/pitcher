@@ -8,6 +8,8 @@
   import { formatPercent, parseBpm } from '../lib/music.ts';
   import { session } from '../lib/session.svelte.ts';
 
+  let { centred = false }: { centred?: boolean } = $props();
+
   let editing = $state(false);
   let value = $state('');
   let input: HTMLInputElement | undefined = $state();
@@ -29,7 +31,7 @@
   }
 </script>
 
-<section class="tempo">
+<section class="tempo" class:centred>
   <div class="read">
     <span class="label sr">{t('tempo.label')}</span>
     <div class="big">
@@ -112,7 +114,7 @@
     outline: none;
     color: var(--big);
     caret-color: var(--amber);
-    font: 650 92px/0.95 var(--font);
+    font: 650 clamp(92px, 9vh, 136px) / 0.95 var(--font);
     font-stretch: 115%;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
@@ -120,6 +122,11 @@
 
   .bpm:focus {
     box-shadow: 0 3px 0 var(--amber);
+  }
+
+  /* Under the playhead on an ultrawide: the reading centred over the ruler's needle. */
+  .centred .read {
+    justify-content: center;
   }
 
   :global(.is-orig) .bpm,

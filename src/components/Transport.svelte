@@ -12,7 +12,7 @@
   import { session } from '../lib/session.svelte.ts';
   import { summaryText } from '../lib/share.ts';
 
-  let { wide }: { wide: boolean } = $props();
+  let { wide, grouped = false }: { wide: boolean; grouped?: boolean } = $props();
 
   const rate = $derived(session.orig ? 1 : session.ratio);
   const beatPhase = $derived(((session.pos - session.grid.offset) / (60 / session.grid.bpm)) % 1);
@@ -46,7 +46,7 @@
   }
 </script>
 
-<footer class="transport">
+<footer class="transport" class:grouped>
   <button type="button" class="play" class:on={session.playing} aria-label={session.playing ? t('transport.pause') : t('transport.play')} onclick={() => session.togglePlay()}>
     {#if session.playing}
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" /></svg>
@@ -62,7 +62,7 @@
   <button type="button" class="btn" class:on={session.loopOn} aria-pressed={session.loopOn} onclick={() => session.toggleLoop()}>{t('transport.loop')}</button>
   <button type="button" class="btn bars" title={t('transport.barsTitle')} onclick={() => session.cycleLoopBars()}>{t('transport.bars', { count: prefs.loopBars })}</button>
   <button type="button" class="btn" title={t('transport.hookTitle')} onclick={() => session.jumpToHook()}>{t('transport.hook')}</button>
-  {#if wide}<span class="gap"></span>{/if}
+  {#if wide && !grouped}<span class="gap"></span>{/if}
   <button type="button" class="btn" class:on={prefs.kick} class:blink aria-pressed={prefs.kick} title={t('transport.kickTitle')} onclick={() => (prefs.kick = !prefs.kick)}>
     <i class="led"></i>{t('transport.kick')}
   </button>
@@ -135,6 +135,11 @@
 
   .gap {
     flex: 1;
+  }
+
+  /* On an ultrawide the whole row stays together, under the playhead. */
+  .grouped {
+    justify-content: center;
   }
 
   @media (max-width: 759.98px) {

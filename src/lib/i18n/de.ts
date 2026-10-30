@@ -63,6 +63,7 @@ export const de: Record<MessageKey, string> = {
 
   'wave.label': 'Wellenform: ziehen zum Spulen',
   'wave.overview': 'Der ganze Track: klicken zum Springen',
+  'wave.zoom': '{count} Takte im Bild',
 
   'settings.title': 'Einstellungen',
   'settings.general': 'Allgemein',
@@ -75,6 +76,7 @@ export const de: Record<MessageKey, string> = {
   'keys.loop': 'Loop',
   'keys.hook': 'Hook',
   'keys.hold': 'Halten: Original',
+  'keys.zoom': 'Wellenform zoomen (oder ⌘ + Scrollen)',
   'keys.nudge': 'Beat-Raster um 5 ms verschieben',
   'keys.tap': 'Quelltempo antippen',
   'keys.link': 'Link einfügen',

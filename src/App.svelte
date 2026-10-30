@@ -10,7 +10,7 @@
   import { toast } from '../vendor/ewo/elements/toaster.js';
   import { openDrop, openFile, openText } from './lib/actions.ts';
   import { t } from './lib/i18n/index.svelte.ts';
-  import { prefs, ui } from './lib/prefs.svelte.ts';
+  import { prefs, ui, zoomBy } from './lib/prefs.svelte.ts';
   import { session } from './lib/session.svelte.ts';
   import { readAddress } from './lib/share.ts';
 
@@ -110,6 +110,13 @@
       case ']':
         session.nudgeGrid(key === ']' ? 5 : -5);
         toast(t('toast.nudged', { ms: Math.round(session.nudge * 1000) }), { duration: 1500 });
+        break;
+      case '-':
+        zoomBy(-1);
+        break;
+      case '+':
+      case '=':
+        zoomBy(1);
         break;
       case 't': {
         const bpm = session.tap();

@@ -12,10 +12,23 @@ interface Prefs {
   loopBars: 4 | 8 | 16;
   /** The last target tempo: the next track opens at it, so a session at 140 stays at 140. */
   target: number | null;
+  /** The waveform's zoom, an index into ZOOM. */
+  zoom: number;
 }
 
 const KEY = 'pitcher:prefs';
-const DEFAULTS: Prefs = { language: 'system', mode: 'keep', kick: false, loopBars: 8, target: null };
+const DEFAULTS: Prefs = { language: 'system', mode: 'keep', kick: false, loopBars: 8, target: null, zoom: 2 };
+
+/**
+ * The waveform's zoom in pixels per beat, so the beat grid looks the same for every track and a wider
+ * screen shows more of the track rather than a bigger one: 77 px a beat is about 11 bars on 3440 px.
+ */
+export const ZOOM = [160, 110, 77, 55, 38, 26, 18] as const;
+
+/** −1 zooms out, +1 in. */
+export function zoomBy(step: number) {
+  prefs.zoom = Math.max(0, Math.min(ZOOM.length - 1, prefs.zoom - step));
+}
 
 function load<T>(key: string, fallback: T): T {
   try {

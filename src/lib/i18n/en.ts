@@ -61,6 +61,7 @@ export const en = {
 
   'wave.label': 'Waveform: drag it to jog',
   'wave.overview': 'The whole track: click to jump',
+  'wave.zoom': '{count} bars on screen',
 
   'settings.title': 'Settings',
   'settings.general': 'General',
@@ -73,6 +74,7 @@ export const en = {
   'keys.loop': 'Loop',
   'keys.hook': 'Hook',
   'keys.hold': 'Hold: original',
+  'keys.zoom': 'Zoom the waveform (or ⌘ + scroll)',
   'keys.nudge': 'Move the beat grid 5 ms',
   'keys.tap': 'Tap the source tempo',
   'keys.link': 'Paste a link',
