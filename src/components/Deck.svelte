@@ -1,12 +1,13 @@
 <!--
-  The deck, once a track is loaded: the track and what was detected, the waveform, then the tempo
-  beside the key, and the transport. On a wide screen it fills the window below the header; on a
-  narrow one it stacks, with a key row in place of the wheel. From 2000 px wide (an ultrawide) the
-  controls become one centred group: the tempo under the playhead with the ruler's needle on the same
-  line, the key beside it, and the transport in one row beneath.
+  The deck, once a track is loaded: the track and what was detected, then the stage, the whole track,
+  and the transport. The stage is the waveform, full bleed: the tempo and the key float over it as two
+  readouts, and the tempo ruler is its bottom edge. On a phone the key's controls get a row of their
+  own under the stage, and the transport sits in the thumb zone. On an ultrawide the readouts and the
+  transport keep to a centred group while the waveform runs the whole width.
 -->
 <script lang="ts">
   import Key from './Key.svelte';
+  import Ruler from './Ruler.svelte';
   import Tempo from './Tempo.svelte';
   import Track from './Track.svelte';
   import Transport from './Transport.svelte';
@@ -29,115 +30,95 @@
   }
 
   const wide = query('(min-width: 760px)');
-  const ultra = query('(min-width: 2000px)');
+  const short = query('(max-height: 760px)');
+  /** The ruler's height: the stage's bottom edge, kept clear of the waveform. */
+  const floor = $derived(wide.matches ? (short.matches ? 76 : 88) : 72);
 
-  let tempo: Tempo | undefined = $state();
-  export function focusTempo() {
-    tempo?.focus();
-  }
+  let hud: HTMLElement | undefined = $state();
+  let hudHeight = $state(0);
+  /** Where the readouts end: the waveform starts under them when there's room. */
+  const ceiling = $derived(hud && hudHeight ? hud.offsetTop + hudHeight + 12 : 18);
 </script>
 
-<main class="deck" class:is-orig={session.orig} class:ultra={ultra.matches}>
+<main class="deck" class:is-orig={session.orig}>
   <Track />
-  <Wave />
-  <div class="controls">
-    <Tempo bind:this={tempo} centred={ultra.matches} />
-    <Key wide={wide.matches} />
-    <!-- On an ultrawide the transport belongs to the group, right under the tempo. -->
-    {#if ultra.matches}<Transport wide grouped />{/if}
-  </div>
-  {#if !ultra.matches}<Transport wide={wide.matches} />{/if}
+  <Wave {floor} {ceiling}>
+    <div class="hud" bind:this={hud} bind:clientHeight={hudHeight}>
+      <Tempo />
+      <Key variant={wide.matches ? 'full' : 'readout'} />
+    </div>
+    <div class="floor" style:height="{floor}px"><Ruler /></div>
+  </Wave>
+  {#if !wide.matches}<Key variant="row" />{/if}
+  <Transport />
 </main>
 
 <style>
   .deck {
     --group: 1760px;
+    /* The side margin: from an ultrawide on, what keeps the readouts and the transport together. */
+    --side: max(1.25rem, (100% - var(--group)) / 2);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 56px minmax(140px, 1fr) 40px auto 72px;
+    grid-template-rows: 56px minmax(0, 1fr) 40px 96px;
     height: calc(100dvh - var(--ewo-bar-h));
-    min-height: 620px;
+    min-height: 600px;
   }
 
-  .deck > :global(:first-child) {
+  .deck > :global(.track) {
     border-bottom: 1px solid var(--ewo-line);
+    padding-inline: var(--side);
   }
 
-  .controls {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(300px, calc(24vh + 90px), 420px);
-    align-items: center;
+  .hud {
+    position: absolute;
+    top: 26px;
+    left: var(--side);
+    right: var(--side);
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    pointer-events: none;
+  }
+
+  .hud > :global(*) {
+    pointer-events: auto;
+  }
+
+  .floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--well);
     border-top: 1px solid var(--ewo-line);
-    min-height: 280px;
-  }
-
-  .controls > :global(.key) {
-    align-self: stretch;
-    border-left: 1px solid var(--ewo-line);
-  }
-
-  .deck > :global(.transport) {
-    border-top: 1px solid var(--ewo-line);
-  }
-
-  /* An ultrawide: one centred group, its tempo column centred on the screen, under the playhead. */
-  .ultra > :global(.track),
-  .ultra .controls {
-    padding-left: calc((100% - var(--group)) / 2);
-    padding-right: calc((100% - var(--group)) / 2);
-  }
-
-  /* The waveform grows with the screen's height up to a cap, so it doesn't take half the screen. */
-  .ultra {
-    grid-template-rows: 56px clamp(160px, 28vh, 360px) 40px minmax(0, 1fr);
-  }
-
-  /* Close under the waveform, where the eyes already are; the spare height stays below. */
-  .ultra .controls {
-    grid-template-columns: 1fr minmax(0, 2.4fr) 1fr;
-    align-content: start;
-    row-gap: 20px;
-    padding-top: clamp(32px, 6vh, 88px);
-  }
-
-  .ultra .controls > :global(.transport) {
-    grid-column: 1 / -1;
-    justify-self: center;
-    padding: 0;
-  }
-
-  /* The left column stays empty, so the tempo's column is centred on the screen. */
-  .ultra .controls > :global(.tempo) {
-    grid-column: 2;
-  }
-
-  .ultra .controls > :global(.key) {
-    grid-column: 3;
-    border-left: 0;
-    align-self: center;
   }
 
   @media (max-height: 760px) and (min-width: 760px) {
-    .deck:not(.ultra) {
-      grid-template-rows: 56px minmax(120px, 1fr) 36px auto 68px;
+    .deck {
+      grid-template-rows: 52px minmax(0, 1fr) 36px 84px;
+    }
+
+    .hud {
+      top: 22px;
     }
   }
 
   @media (max-width: 759.98px) {
     .deck {
-      grid-template-rows: auto clamp(120px, 22vh, 180px) 36px auto auto;
-      height: auto;
-      min-height: 0;
+      grid-template-rows: auto minmax(0, 1fr) 34px auto auto;
     }
 
-    .controls {
-      grid-template-columns: minmax(0, 1fr);
-      min-height: 0;
+    .deck > :global(.track) {
+      padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
     }
 
-    .controls > :global(.key) {
-      border-left: 0;
-      border-top: 1px solid var(--ewo-line);
+    .hud {
+      top: 22px;
+      left: max(0.75rem, env(safe-area-inset-left));
+      right: max(0.75rem, env(safe-area-inset-right));
+      gap: 10px;
     }
   }
 </style>

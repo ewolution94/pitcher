@@ -40,8 +40,6 @@ export const de: Record<MessageKey, string> = {
   'key.resampleTitle': 'Die Tonhöhe folgt dem Tempo, wie bei einer Platte (FL Studios Standard)',
   'key.down': 'Tonart einen Halbton runter',
   'key.up': 'Tonart einen Halbton hoch',
-  'key.from': '{shift} von {key}',
-  'key.wheel': 'Camelot-Rad: eine Tonart antippen, um dorthin zu wechseln',
 
   'transport.play': 'Abspielen',
   'transport.pause': 'Pause',

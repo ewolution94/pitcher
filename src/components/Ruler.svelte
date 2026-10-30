@@ -1,5 +1,5 @@
 <!--
-  The tempo ruler: BPM slides under a fixed needle. Strobe dots every half BPM, ticks every BPM, the
+  The tempo ruler, the stage's bottom edge: BPM slides under a fixed needle. Strobe dots every half BPM, ticks every BPM, the
   numbers every ten, and the genre stops below. Drag it, or throw it and let it settle (on a stop
   when it ends near one); a tap on a genre's name jumps there. Sideways scrolling moves it too. The
   source tempo (and its half and double) is marked, so you see how far you've gone.
@@ -74,7 +74,7 @@
       x.fillText(k === 1 ? 'SOURCE' : k === 2 ? 'SOURCE ×2' : 'SOURCE ÷2', px + 7, dotY + 3.5);
     }
 
-    const edge = P['ewo-bg'];
+    const edge = P.well;
     const g = x.createLinearGradient(0, 0, w, 0);
     g.addColorStop(0, edge);
     g.addColorStop(0.09, withAlpha(edge, 0));
@@ -190,7 +190,7 @@
   .ruler {
     position: relative;
     min-width: 0;
-    border-block: 1px solid var(--ewo-line);
+    height: 100%;
   }
 
   canvas {

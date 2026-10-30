@@ -7,7 +7,7 @@ Live at [pitcher.ewolution.cloud](https://pitcher.ewolution.cloud).
 - **The tempo, typed or thrown.** Type a BPM into the big number, or drag the ruler (throw it and it
   settles on a genre stop: House 124, Techno 132, DnB 174 …). The arrow keys nudge by 0.1 or 1.
 - **Keep key or Resample.** Keep key (the default) changes the tempo and holds the key; Resample ties
-  the pitch to the tempo like a record. The key moves on its own too: the Camelot wheel, − and +.
+  the pitch to the tempo like a record. The key moves on its own too, with − and +.
 - **Detected, then yours.** The source tempo, its beat grid and its key are read in the page. Click
   the tempo to correct it, tap it with `T`, read it as half or double time (picked on its own when
   that's closer), pick another key.
@@ -80,7 +80,7 @@ src/lib/yt/      extract.ts (youtubei.js, lazily), download.ts, relay.ts, url.ts
 src/lib/analysis bands.ts, tempo.ts, key.ts, fft.ts, worker.ts, protocol.ts
 src/lib/audio/   engine.ts (Signalsmith Stretch, the kick)
 src/lib/         session.svelte.ts, music.ts, share.ts, prefs, theme, i18n
-src/components/  Header, Start, Deck (Track, Wave, Tempo + Ruler, Key + Wheel, Transport), Settings
+src/components/  Header, Start, Deck (Track, Wave as the stage with Tempo, Key and Ruler over it, Transport), Settings
 vendor/ewo/      Folio's tokens and elements (npm run vendor -- pitcher, in Folio)
 tests/           node --test, no browser
 ```

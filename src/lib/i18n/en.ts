@@ -38,8 +38,6 @@ export const en = {
   'key.resampleTitle': 'The pitch follows the tempo, like a record (FL Studio’s default)',
   'key.down': 'Key down a semitone',
   'key.up': 'Key up a semitone',
-  'key.from': '{shift} from {key}',
-  'key.wheel': 'Camelot wheel: tap a key to move to it',
 
   'transport.play': 'Play',
   'transport.pause': 'Pause',

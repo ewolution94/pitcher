@@ -92,6 +92,33 @@ p {
   white-space: nowrap;
 }
 
+/* The stage's readouts: cards over the waveform, nearly opaque so they read over any part of it. No
+   backdrop-filter: the waveform scrolls behind them every frame while it plays
+   (learnings/performance.md). */
+.readout {
+  display: grid;
+  gap: 6px;
+  padding: 12px 18px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--ewo-line);
+  background: color-mix(in oklab, var(--well) 86%, transparent);
+}
+
+@media (max-width: 759.98px) {
+  .readout {
+    gap: 4px;
+    padding: 9px 12px 10px;
+    border-radius: 12px;
+  }
+}
+
+/* A small phone: the readouts without their labels, so the waveform keeps some room. */
+@media (max-width: 759.98px) and (max-height: 740px) {
+  .readout > .label {
+    display: none;
+  }
+}
+
 /* The deck's buttons: plain, hardware-like rectangles; on is amber. */
 .btn {
   display: inline-flex;
@@ -123,21 +150,6 @@ p {
 .btn:disabled {
   opacity: 0.5;
   cursor: default;
-}
-
-.led {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--ewo-fg-3);
-}
-
-.on > .led {
-  background: var(--amber);
-}
-
-.blink > .led {
-  box-shadow: 0 0 8px 2px var(--amber);
 }
 
 :focus-visible {

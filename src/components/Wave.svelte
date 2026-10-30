@@ -1,16 +1,27 @@
 <!--
-  The waveform, as a deck shows it: the lows, mids and highs in their own colours, scrolling past a
-  fixed playhead with the beat grid and bar numbers over it (drag it to jog), and the whole track
-  below, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
+  The waveform, as a deck shows it, and the deck's stage: the lows, mids and highs in their own
+  colours, scrolling past a fixed playhead with the beat grid and bar numbers over it (drag it to jog);
+  what the deck floats over it comes in as children, `floor` keeps the bottom edge clear for the ruler,
+  and the waveform starts under `ceiling` (where the readouts end) when there's room for it. Then the whole track below, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
   drag to jump). The zoom is in pixels per beat, so a wider screen shows more bars rather than bigger
   ones; ⌘ + scroll (or pinch) on the waveform, and − and +, change it.
 -->
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { barLength, beatLength } from '../lib/analysis/tempo.ts';
   import { t } from '../lib/i18n/index.svelte.ts';
   import { prefs, ZOOM, zoomBy } from '../lib/prefs.svelte.ts';
   import { colours, type Palette } from '../lib/palette.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
+
+  let { floor = 0, ceiling = 18, children }: { floor?: number; ceiling?: number; children?: Snippet } = $props();
+
+  /** How far the waveform reaches up and down from its middle at most, so a tall screen shows more
+      room around it rather than a giant one. */
+  const REACH = 230;
+  /** The least height the waveform keeps above the floor; with less room under the readouts it runs on
+      under them. */
+  const LEAST = 160;
 
   let zoom: HTMLCanvasElement | undefined = $state();
   let over: HTMLCanvasElement | undefined = $state();
@@ -68,17 +79,19 @@
     const t0 = pos - span / 2;
     const pps = w / span;
     const top = 18;
-    const cy = top + (h - top) / 2;
-    const hh = (h - top) / 2 - 6;
+    const bottom = h - floor;
+    const body = Math.max(top, Math.min(ceiling, bottom - LEAST));
+    const cy = (body + bottom) / 2;
+    const hh = Math.min(REACH, (bottom - body) / 2 - 6);
     const frames = bands.lo.length;
 
     if (session.loopOn) {
       const a = (session.loopStart - t0) * pps, b = (session.loopEnd - t0) * pps;
       x.fillStyle = P['amber-soft'];
-      x.fillRect(a, top, b - a, h - top);
+      x.fillRect(a, top, b - a, bottom - top);
       x.fillStyle = P.amber;
-      x.fillRect(a, top, 1.5, h - top);
-      x.fillRect(b - 1.5, top, 1.5, h - top);
+      x.fillRect(a, top, 1.5, bottom - top);
+      x.fillRect(b - 1.5, top, 1.5, bottom - top);
     }
 
     const layers: [Float32Array, string, number][] = [
@@ -110,7 +123,7 @@
       const px = (grid.offset + k * beat - t0) * pps;
       const bar = ((k % 4) + 4) % 4 === 0;
       x.fillStyle = bar ? P['grid-bar'] : P.grid;
-      x.fillRect(px, top, 1, h - top);
+      x.fillRect(px, top, 1, bottom - top);
       if (bar) {
         x.fillStyle = P['ewo-fg-2'];
         x.fillText(String(Math.floor(k / 4) + 1), px + 4, 13);
@@ -118,7 +131,7 @@
     }
 
     x.fillStyle = P.amber;
-    x.fillRect(w / 2 - 1, 0, 2, h);
+    x.fillRect(w / 2 - 1, 0, 2, bottom);
     x.beginPath();
     x.moveTo(w / 2 - 6, 0);
     x.lineTo(w / 2 + 6, 0);
@@ -242,7 +255,7 @@
   }
 </script>
 
-<div class="zoom" bind:clientWidth={zw} bind:clientHeight={zh}>
+<div class="zoom" style:--floor="{floor}px" bind:clientWidth={zw} bind:clientHeight={zh}>
   <canvas
     bind:this={zoom}
     aria-label={t('wave.label')}
@@ -252,6 +265,7 @@
     onpointerup={() => ((jog = null), (grabbing = false))}
     onpointercancel={() => ((jog = null), (grabbing = false))}
   ></canvas>
+  {@render children?.()}
   {#if session.orig}<span class="badge">{t('transport.original')}</span>{/if}
   <span class="zoomed" class:shown={zoomNote} aria-live="polite">{zoomNote ? t('wave.zoom', { count: bars }) : ''}</span>
 </div>
@@ -311,7 +325,7 @@
   .zoomed {
     position: absolute;
     left: 12px;
-    bottom: 10px;
+    bottom: calc(var(--floor) + 10px);
     padding: 3px 8px;
     border-radius: 4px;
     background: var(--ewo-bg-raised);
@@ -330,8 +344,9 @@
 
   .badge {
     position: absolute;
-    right: 12px;
-    bottom: 10px;
+    left: 50%;
+    translate: -50% 0;
+    bottom: calc(var(--floor) + 10px);
     padding: 3px 8px;
     border-radius: 4px;
     background: var(--ewo-fg);
