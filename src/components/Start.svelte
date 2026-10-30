@@ -67,7 +67,7 @@
       <div class="recent">
         <h2 class="label">{t('start.recent')}</h2>
         <ul>
-          {#each recent.list as r (r.id)}
+          {#each recent.list.slice(0, 8) as r (r.id)}
             <li>
               <button type="button" class="open" onclick={() => openRecent(r)}>
                 <span class="name"><b>{r.title}</b>{#if r.channel}<span>{r.channel}</span>{/if}</span>

@@ -1,6 +1,8 @@
 // This device's preferences (the theme lives in theme.svelte.ts, which boot.js mirrors before first
 // paint), the recent tracks, and what's open right now.
 
+import type { Key } from './music.ts';
+
 export type Language = 'system' | 'en' | 'de';
 export type Mode = 'keep' | 'resample';
 
@@ -52,10 +54,16 @@ export interface Recent {
   shift: number;
   mode: Mode;
   at: number;
+  /** The source as it was read (missing on entries from before the crate). */
+  src?: number;
+  key?: Key;
+  /** A thumbnail of the waveform, 0–1 (music.ts `overview`). */
+  overview?: number[];
 }
 
 const RECENT_KEY = 'pitcher:recent';
-const MAX_RECENT = 8;
+/** The crate's size; the start screen shows the first few. */
+const MAX_RECENT = 50;
 
 function loadRecent(): Recent[] {
   try {

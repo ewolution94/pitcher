@@ -7,6 +7,9 @@ import {
   camelot,
   formatPercent,
   formatShift,
+  keysMix,
+  overview,
+  tempoNear,
   keyFromCamelot,
   keyName,
   parseBpm,
@@ -103,4 +106,32 @@ test('Copy writes the numbers a DAW needs and the link back', () => {
 test('the relay only reaches YouTube', () => {
   for (const host of ['www.youtube.com', 'rr3---sn-4g5e6nzz.googlevideo.com', 'i.ytimg.com', 'youtubei.googleapis.com']) assert.ok(isAllowedHost(host), host);
   for (const host of ['example.com', 'youtube.com.evil.net', 'googleapis.com', '192.168.178.36', 'census']) assert.ok(!isAllowedHost(host), host);
+});
+
+test('keys that mix: the same, a Camelot neighbour, or the relative', () => {
+  const Gm = { pc: 7, minor: true }; // 6A
+  assert.ok(keysMix(Gm, Gm));
+  assert.ok(keysMix(Gm, { pc: 0, minor: true })); // Cm, 5A
+  assert.ok(keysMix(Gm, { pc: 2, minor: true })); // Dm, 7A
+  assert.ok(keysMix(Gm, { pc: 10, minor: false })); // B♭, 6B
+  assert.ok(!keysMix(Gm, { pc: 9, minor: true })); // Am, 8A
+  assert.ok(!keysMix(Gm, { pc: 0, minor: false })); // C, 8B
+  assert.ok(keysMix({ pc: 8, minor: true }, { pc: 1, minor: true })); // 1A and 12A wrap round
+});
+
+test('a source tempo near the target, read as half or double time when closer', () => {
+  assert.ok(tempoNear(122, 128));
+  assert.ok(!tempoNear(116, 128));
+  assert.ok(tempoNear(87, 174));
+  assert.ok(tempoNear(64, 128));
+});
+
+test('the crate\'s waveform thumbnail: a few columns, the loudest at 1', () => {
+  const n = 1000;
+  const lo = new Float32Array(n).map((_, i) => (i < 500 ? 0.2 : 1));
+  const zero = new Float32Array(n);
+  const o = overview({ lo, mi: zero, hi: zero }, 10);
+  assert.equal(o.length, 10);
+  assert.equal(Math.max(...o), 1);
+  assert.equal(o[0], 0.2);
 });
