@@ -171,9 +171,11 @@
     cursor: pointer;
   }
 
+  /* A narrow screen: the parts wrap rather than push the page wider than the screen. */
   @media (max-width: 759.98px) {
     .detected {
-      gap: 10px;
+      flex-wrap: wrap;
+      gap: 4px 10px;
       font-size: 12px;
     }
 

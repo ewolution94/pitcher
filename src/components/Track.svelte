@@ -71,6 +71,7 @@
     }
 
     .end {
+      min-width: 0;
       margin-left: 0;
     }
   }

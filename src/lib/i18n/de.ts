@@ -57,6 +57,8 @@ export const de: Record<MessageKey, string> = {
   'transport.copyTitle': 'Tempo, Tonart und einen Link kopieren',
   'transport.copied': 'Kopiert: Tempo, Tonart und Link',
   'transport.copyFailed': 'Kopieren ging nicht. Nimm den Link aus der Adresszeile.',
+  'transport.reset': 'Zurücksetzen',
+  'transport.resetTitle': 'Zurück zu Tempo und Tonart des Tracks',
   'transport.original': 'Original',
 
   'wave.label': 'Wellenform: ziehen zum Spulen',
@@ -70,6 +72,7 @@ export const de: Record<MessageKey, string> = {
   'keys.tempo': 'Tempo ±0,1 BPM (⇧: ±1)',
   'keys.key': 'Tonart ±1 Halbton (⇧: ±10 Cent)',
   'keys.mode': 'Tonart halten oder Resample',
+  'keys.reset': 'Zurück zu Tempo und Tonart des Tracks',
   'keys.kick': 'Kick',
   'keys.loop': 'Loop',
   'keys.hook': 'Hook',

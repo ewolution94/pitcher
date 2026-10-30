@@ -91,6 +91,9 @@
         session.setShift(big ? session.shift + step * 0.1 : Math.round(session.shift) + step);
         break;
       }
+      case '0':
+        session.reset();
+        break;
       case 'r':
         session.setMode(prefs.mode === 'keep' ? 'resample' : 'keep');
         break;

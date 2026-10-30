@@ -55,6 +55,8 @@ export const en = {
   'transport.copyTitle': 'Copy the tempo, key and a link',
   'transport.copied': 'Copied: tempo, key and link',
   'transport.copyFailed': 'Couldn’t copy. Select the link in the address bar instead.',
+  'transport.reset': 'Reset',
+  'transport.resetTitle': 'Back to the track’s own tempo and key',
   'transport.original': 'Original',
 
   'wave.label': 'Waveform: drag it to jog',
@@ -68,6 +70,7 @@ export const en = {
   'keys.tempo': 'Tempo ±0.1 BPM (⇧: ±1)',
   'keys.key': 'Key ±1 semitone (⇧: ±10 cents)',
   'keys.mode': 'Keep key or Resample',
+  'keys.reset': 'Back to the track’s own tempo and key',
   'keys.kick': 'Kick',
   'keys.loop': 'Loop',
   'keys.hook': 'Hook',

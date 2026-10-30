@@ -26,6 +26,7 @@
     [['←', '→'], 'keys.tempo'],
     [['↑', '↓'], 'keys.key'],
     [['R'], 'keys.mode'],
+    [['0'], 'keys.reset'],
     [['K'], 'keys.kick'],
     [['L'], 'keys.loop'],
     [['H'], 'keys.hook'],

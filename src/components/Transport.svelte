@@ -1,14 +1,15 @@
 <!--
   The transport, down to what a session uses: where you are (bar.beat, time at the new tempo, the new
   length) on the left; Loop, Hold for the original, the big play button, the Kick (it lights on the
-  beat) and Hook in the middle; the loop's length and Copy (the numbers for the DAW and a link back) on
-  the right. On a phone the middle row is the thumb's, the rest goes above it.
+  beat) and Hook in the middle; Reset (back to the track's own tempo and key), the loop's length and
+  Copy (the numbers for the DAW and a link back) on the right. On a phone the middle row is the thumb's, the rest goes above it.
 -->
 <script lang="ts">
   import AudioWaveform from '@lucide/svelte/icons/audio-waveform';
   import CircleDot from '@lucide/svelte/icons/circle-dot';
   import Flame from '@lucide/svelte/icons/flame';
   import Repeat from '@lucide/svelte/icons/repeat';
+  import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
   import { toast } from '../../vendor/ewo/elements/toaster.js';
   import { barBeat } from '../lib/analysis/tempo.ts';
   import { t } from '../lib/i18n/index.svelte.ts';
@@ -55,7 +56,7 @@
   <span class="pos">
     <b>{barBeat(session.pos, session.grid)}</b>
     <span>{formatTime(session.pos / rate)}</span>
-    <span>/ {formatTime((session.track?.duration ?? 0) / rate)}</span>
+    <span class="len">/ {formatTime((session.track?.duration ?? 0) / rate)}</span>
   </span>
   <div class="centre">
     <button type="button" class="tb" class:on={session.loopOn} aria-pressed={session.loopOn} onclick={() => session.toggleLoop()}>
@@ -91,6 +92,9 @@
     </button>
   </div>
   <div class="end">
+    <button type="button" class="btn reset" aria-label={t('transport.reset')} title={t('transport.resetTitle')} disabled={session.untouched} onclick={() => session.reset()}>
+      <RotateCcw size={15} /><span class="text">{t('transport.reset')}</span>
+    </button>
     <button type="button" class="btn bars" title={t('transport.barsTitle')} onclick={() => session.cycleLoopBars()}>{t('transport.bars', { count: prefs.loopBars })}</button>
     <button type="button" class="btn" title={t('transport.copyTitle')} onclick={copy}>{t('transport.copy')}</button>
   </div>
@@ -137,6 +141,11 @@
 
   .bars {
     color: var(--ewo-fg-2);
+  }
+
+  .reset:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 
   /* Round buttons with their name under them, like a player's. */
@@ -270,6 +279,16 @@
 
     .pos {
       grid-area: pos;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .reset {
+      padding: 0 9px;
+    }
+
+    .reset .text {
+      display: none;
     }
 
     .end {
@@ -292,6 +311,12 @@
       width: 68px;
       height: 68px;
       margin: 0;
+    }
+  }
+
+  @media (max-width: 374.98px) {
+    .len {
+      display: none;
     }
   }
 </style>

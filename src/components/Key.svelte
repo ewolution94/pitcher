@@ -131,9 +131,10 @@
   /* A phone: the key's controls under the stage, the stepper on the left, the mode on the right. */
   .row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 8px 10px;
     padding: 10px max(1rem, env(safe-area-inset-right)) 10px max(1rem, env(safe-area-inset-left));
     border-top: 1px solid var(--ewo-line);
   }
@@ -155,9 +156,13 @@
     height: 40px;
   }
 
+  .row .seg {
+    margin-left: auto;
+  }
+
   .row .seg button {
     height: 40px;
-    padding: 0 12px;
+    padding: 0 11px;
   }
 
   @media (max-width: 759.98px) {

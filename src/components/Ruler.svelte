@@ -12,8 +12,8 @@
 
   let canvas: HTMLCanvasElement | undefined = $state();
   let w = $state(0), h = $state(0);
-  /** Pixels per BPM. */
-  const PPB = 15;
+  /** Pixels per BPM: more on a phone, where a finger needs the room for a fine move. */
+  const PPB = $derived(w && w < 560 ? 20 : 15);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   $effect(() => {
@@ -45,7 +45,9 @@
     }
     x.globalAlpha = 1;
     x.textAlign = 'center';
-    x.font = '650 12px "Archivo Variable", sans-serif';
+    // A taller ruler gets bigger type.
+    const tall = h >= 96;
+    x.font = `650 ${tall ? 13 : 12}px "Archivo Variable", sans-serif`;
     x.fillStyle = P['ewo-fg-2'];
     for (let b = Math.ceil(lo / 10) * 10; b <= hi; b += 10) x.fillText(String(b), cx + (b - tempo) * PPB, numY);
 
@@ -57,7 +59,7 @@
       x.beginPath();
       x.arc(px, numY + 8, on ? 2.2 : 1.6, 0, Math.PI * 2);
       x.fill();
-      x.font = `${on ? 700 : 500} 10px "Archivo Variable", sans-serif`;
+      x.font = `${on ? 700 : 500} ${tall ? 11 : 10}px "Archivo Variable", sans-serif`;
       x.fillStyle = on ? P.amber : P['ewo-fg-2'];
       x.fillText(name, px, h * 0.87);
     }
@@ -74,7 +76,7 @@
       x.fillText(k === 1 ? 'SOURCE' : k === 2 ? 'SOURCE ×2' : 'SOURCE ÷2', px + 7, dotY + 3.5);
     }
 
-    const edge = P.well;
+    const edge = P['ewo-bg-raised'];
     const g = x.createLinearGradient(0, 0, w, 0);
     g.addColorStop(0, edge);
     g.addColorStop(0.09, withAlpha(edge, 0));

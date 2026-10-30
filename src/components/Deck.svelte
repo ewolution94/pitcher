@@ -2,8 +2,8 @@
   The deck, once a track is loaded: the track and what was detected, then the stage, the whole track,
   and the transport. The stage is the waveform, full bleed: the tempo and the key float over it as two
   readouts, and the tempo ruler is its bottom edge. On a phone the key's controls get a row of their
-  own under the stage, and the transport sits in the thumb zone. On an ultrawide the readouts and the
-  transport keep to a centred group while the waveform runs the whole width.
+  own under the stage, and the transport sits in the thumb zone. Wider than a 1080p screen, everything
+  you use keeps to a centred group as wide as one, and the waveform runs on at the sides, fading out.
 -->
 <script lang="ts">
   import Key from './Key.svelte';
@@ -31,18 +31,20 @@
 
   const wide = query('(min-width: 760px)');
   const short = query('(max-height: 760px)');
-  /** The ruler's height: the stage's bottom edge, kept clear of the waveform. */
-  const floor = $derived(wide.matches ? (short.matches ? 76 : 88) : 72);
+  /** The ruler's height: the stage's bottom edge. Tall on a phone, where it's dragged with a thumb. */
+  const floor = $derived(wide.matches ? (short.matches ? 84 : 96) : 104);
+  /** The room between the waveform and what's above and below it. */
+  const gap = $derived(wide.matches ? (short.matches ? 20 : 28) : 16);
 
   let hud: HTMLElement | undefined = $state();
   let hudHeight = $state(0);
   /** Where the readouts end: the waveform starts under them when there's room. */
-  const ceiling = $derived(hud && hudHeight ? hud.offsetTop + hudHeight + 12 : 18);
+  const ceiling = $derived(hud && hudHeight ? hud.offsetTop + hudHeight + gap : 18);
 </script>
 
 <main class="deck" class:is-orig={session.orig}>
   <Track />
-  <Wave {floor} {ceiling}>
+  <Wave {floor} {gap} {ceiling}>
     <div class="hud" bind:this={hud} bind:clientHeight={hudHeight}>
       <Tempo />
       <Key variant={wide.matches ? 'full' : 'readout'} />
@@ -55,12 +57,14 @@
 
 <style>
   .deck {
-    --group: 1760px;
-    /* The side margin: from an ultrawide on, what keeps the readouts and the transport together. */
+    /* A 1080p screen's width: wider than that, the controls keep together in the middle. */
+    --group: 1920px;
+    /* What's beside the group (nothing up to its width), and the side margin, at least a gutter. */
+    --wing: max(0px, (100% - var(--group)) / 2);
     --side: max(1.25rem, (100% - var(--group)) / 2);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 56px minmax(0, 1fr) 40px 96px;
+    grid-template-rows: 56px minmax(0, 1fr) 64px 112px;
     height: calc(100dvh - var(--ewo-bar-h));
     min-height: 600px;
   }
@@ -68,6 +72,17 @@
   .deck > :global(.track) {
     border-bottom: 1px solid var(--ewo-line);
     padding-inline: var(--side);
+  }
+
+  /* Beside the group the waveform fades out towards the screen's edges. */
+  .deck :global(.zoom > canvas) {
+    --fade: linear-gradient(to right, rgb(0 0 0 / 0.12), #000 var(--wing), #000 calc(100% - var(--wing)), rgb(0 0 0 / 0.12));
+    -webkit-mask-image: var(--fade);
+    mask-image: var(--fade);
+  }
+
+  .deck > :global(.over) {
+    margin: 14px var(--side);
   }
 
   .hud {
@@ -88,16 +103,20 @@
 
   .floor {
     position: absolute;
-    left: 0;
-    right: 0;
+    left: var(--wing);
+    right: var(--wing);
     bottom: 0;
-    background: var(--well);
+    background: var(--ewo-bg-raised);
     border-top: 1px solid var(--ewo-line);
   }
 
   @media (max-height: 760px) and (min-width: 760px) {
     .deck {
-      grid-template-rows: 52px minmax(0, 1fr) 36px 84px;
+      grid-template-rows: 52px minmax(0, 1fr) 52px 92px;
+    }
+
+    .deck > :global(.over) {
+      margin-block: 10px;
     }
 
     .hud {
@@ -112,6 +131,10 @@
 
     .deck > :global(.track) {
       padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+    }
+
+    .deck > :global(.over) {
+      margin: 5px max(1rem, env(safe-area-inset-right)) 5px max(1rem, env(safe-area-inset-left));
     }
 
     .hud {

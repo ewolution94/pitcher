@@ -1,8 +1,9 @@
 <!--
   The waveform, as a deck shows it, and the deck's stage: the lows, mids and highs in their own
   colours, scrolling past a fixed playhead with the beat grid and bar numbers over it (drag it to jog);
-  what the deck floats over it comes in as children, `floor` keeps the bottom edge clear for the ruler,
-  and the waveform starts under `ceiling` (where the readouts end) when there's room for it. Then the whole track below, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
+  what the deck floats over it comes in as children, `floor` keeps the bottom edge clear for the ruler
+  (and `gap` above it), and the waveform starts under `ceiling` (where the readouts end) when there's
+  room for it. Then the whole track below, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
   drag to jump). The zoom is in pixels per beat, so a wider screen shows more bars rather than bigger
   ones; ⌘ + scroll (or pinch) on the waveform, and − and +, change it.
 -->
@@ -14,14 +15,14 @@
   import { colours, type Palette } from '../lib/palette.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
-  let { floor = 0, ceiling = 18, children }: { floor?: number; ceiling?: number; children?: Snippet } = $props();
+  let { floor = 0, gap = 0, ceiling = 18, children }: { floor?: number; gap?: number; ceiling?: number; children?: Snippet } = $props();
 
   /** How far the waveform reaches up and down from its middle at most, so a tall screen shows more
       room around it rather than a giant one. */
   const REACH = 230;
   /** The least height the waveform keeps above the floor; with less room under the readouts it runs on
       under them. */
-  const LEAST = 160;
+  const LEAST = 180;
 
   let zoom: HTMLCanvasElement | undefined = $state();
   let over: HTMLCanvasElement | undefined = $state();
@@ -80,9 +81,10 @@
     const pps = w / span;
     const top = 18;
     const bottom = h - floor;
-    const body = Math.max(top, Math.min(ceiling, bottom - LEAST));
-    const cy = (body + bottom) / 2;
-    const hh = Math.min(REACH, (bottom - body) / 2 - 6);
+    const end = bottom - gap;
+    const body = Math.max(top, Math.min(ceiling, end - LEAST));
+    const cy = (body + end) / 2;
+    const hh = Math.min(REACH, (end - body) / 2 - 6);
     const frames = bands.lo.length;
 
     if (session.loopOn) {
