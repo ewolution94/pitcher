@@ -40,9 +40,11 @@
         title={t('track.correct')}
         value={editing ? value : session.srcBpm.toFixed(1)}
         onfocus={(e) => {
+          // currentTarget is gone by the next frame, so keep the field.
+          const field = e.currentTarget;
           editing = true;
           value = session.srcBpm.toFixed(1);
-          requestAnimationFrame(() => (e.currentTarget as HTMLInputElement).select());
+          requestAnimationFrame(() => field.select());
         }}
         oninput={(e) => (value = e.currentTarget.value)}
         onblur={commit}

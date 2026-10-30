@@ -123,6 +123,7 @@
 
   /* Round buttons with their name under them, like a player's. */
   .tb {
+    -webkit-tap-highlight-color: transparent;
     display: grid;
     justify-items: center;
     gap: 4px;
@@ -154,8 +155,25 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .tb:hover:not(:disabled) i {
-    border-color: var(--ewo-fg-3);
+  /* Hover only with a mouse: on a touch screen the last tapped button keeps :hover, which read as on.
+     A keyboard's focus is a neutral ring round the circle, never the amber of on. */
+  @media (hover: hover) and (pointer: fine) {
+    .tb:hover:not(:disabled) i {
+      border-color: var(--ewo-fg-3);
+    }
+
+    .play:hover {
+      background: color-mix(in oklab, var(--amber) 88%, white);
+    }
+  }
+
+  .tb:focus-visible {
+    outline: none;
+  }
+
+  .tb:focus-visible i {
+    outline: 2px solid var(--ewo-fg-2);
+    outline-offset: 2px;
   }
 
   .tb.on {
@@ -217,6 +235,7 @@
   }
 
   .play {
+    -webkit-tap-highlight-color: transparent;
     position: relative;
     width: 64px;
     height: 64px;
@@ -228,10 +247,6 @@
     color: var(--amber-ink);
     box-shadow: 0 2px 10px var(--amber-soft), inset 0 1px 0 rgb(255 255 255 / 0.25);
     transition: scale 0.12s ease;
-  }
-
-  .play:hover {
-    background: color-mix(in oklab, var(--amber) 88%, white);
   }
 
   .play:active {

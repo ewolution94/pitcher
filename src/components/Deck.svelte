@@ -5,7 +5,7 @@
   a band of its own under it, with room on both sides. On a phone the key's controls get a row of
   their own under the ruler, and the transport sits in the thumb zone. Wider than a 1080p screen, everything you use keeps to a centred group as wide as
   one, and the waveform runs on at the sides, fading out; on a tall screen the stage stops growing and
-  the deck sits in the middle.
+  what's left is under the transport, the track row staying right under the header.
 -->
 <script lang="ts">
   import Key from './Key.svelte';
@@ -67,9 +67,9 @@
     --side: max(1.25rem, (100% - var(--group)) / 2);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    /* The stage grows with the screen, to a cap: past it the deck keeps its size in the middle. */
+    /* The stage grows with the screen, to a cap: past it the deck keeps its size, at the top. */
     grid-template-rows: 56px auto minmax(200px, 54vh) auto 112px;
-    align-content: center;
+    align-content: start;
     height: calc(100dvh - var(--ewo-bar-h));
     min-height: 600px;
   }

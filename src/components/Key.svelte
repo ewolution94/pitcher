@@ -124,8 +124,11 @@
     font-weight: 600;
   }
 
-  .step:hover {
-    color: var(--ewo-fg);
+  /* Hover only with a mouse: a touch screen keeps :hover on what was tapped last. */
+  @media (hover: hover) and (pointer: fine) {
+    .step:hover {
+      color: var(--ewo-fg);
+    }
   }
 
   /* A phone: the key's controls under the stage, the stepper on the left, the mode on the right. */

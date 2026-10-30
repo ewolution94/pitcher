@@ -62,8 +62,11 @@
     user-select: none;
   }
 
-  .hold:hover {
-    border-color: var(--ewo-fg-3);
+  /* Hover only with a mouse: a touch screen keeps :hover on what was tapped last. */
+  @media (hover: hover) and (pointer: fine) {
+    .hold:hover {
+      border-color: var(--ewo-fg-3);
+    }
   }
 
   .hold.on {

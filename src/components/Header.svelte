@@ -1,34 +1,19 @@
 <!--
   The sticky header: the name, the link field once a track is on the deck (the start screen has its
-  own, big), and the settings button (Folio's, the same in every app). It's tinted from the left in
-  the track's own colour (its thumbnail's), Pitcher's amber when there's none.
+  own, big), and the settings button (Folio's, the same in every app).
 -->
 <script lang="ts">
   import LinkField from './LinkField.svelte';
   import { ui } from '../lib/prefs.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
-  import { tintOf } from '../lib/tint.ts';
 
   let field: LinkField | undefined = $state();
-  let tint = $state<string | null>(null);
-
-  $effect(() => {
-    const url = session.track?.thumb;
-    tint = null;
-    if (!url) return;
-    let live = true;
-    tintOf(url).then(
-      (colour) => live && (tint = colour),
-      () => {},
-    );
-    return () => (live = false);
-  });
   export function focusLink() {
     field?.focus();
   }
 </script>
 
-<header class="bar" style:--tint={tint}>
+<header class="bar">
   <a class="brand" href="/" onclick={(e) => e.preventDefault()}>
     <img src="/icon.svg" alt="" width="24" height="24" />
     <span class="word">pitcher</span>
@@ -51,11 +36,8 @@
     gap: 14px;
     height: var(--ewo-bar-h);
     padding: 0 max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left));
-    --hue: var(--tint, var(--amber));
-    background:
-      linear-gradient(100deg, color-mix(in oklab, var(--hue) 26%, transparent), color-mix(in oklab, var(--hue) 8%, transparent) 55%, transparent 85%),
-      var(--ewo-bg);
-    border-bottom: 1px solid color-mix(in oklab, var(--hue) 30%, var(--ewo-line));
+    background: var(--ewo-bg);
+    border-bottom: 1px solid var(--ewo-line);
   }
 
   .brand {

@@ -138,10 +138,17 @@
     cursor: pointer;
   }
 
-  .open:hover,
-  .open:focus-within {
+  .open:has(input:focus-visible) {
     color: var(--ewo-fg);
     background: var(--ewo-bg-raised);
+  }
+
+  /* Hover only with a mouse: a touch screen keeps :hover on what was tapped last. */
+  @media (hover: hover) and (pointer: fine) {
+    .open:hover {
+      color: var(--ewo-fg);
+      background: var(--ewo-bg-raised);
+    }
   }
 
   .open input {
