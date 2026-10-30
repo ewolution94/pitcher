@@ -4,27 +4,15 @@
 
 import { engine } from './audio/engine.ts';
 import { analyse, type Analysis } from './analysis/protocol.ts';
-import { barAt, barLength, barStart, beatLength, hookTime } from './analysis/tempo.ts';
+import { barAt, barLength, barStart, hookTime } from './analysis/tempo.ts';
 import { LocalizedError, msg, toMessage, type Message } from './i18n/message.ts';
-import { bestMultiple, MAX_BPM, MIN_BPM, overview, semitonesOf, transpose, type Key } from './music.ts';
+import { bestMultiple, MAX_BPM, MIN_BPM, semitonesOf, transpose, type Key } from './music.ts';
 import { prefs, remember, type Mode } from './prefs.svelte.ts';
 import { addressFor, type Settings } from './share.ts';
 import { downloadAudio } from './yt/download.ts';
 import { loadChunk, thumbnailUrl } from './yt/relay.ts';
 
 export type Stage = 'resolve' | 'download' | 'decode' | 'analyse';
-
-/** A test's settings, saved to compare (takes.svelte.ts keeps them). */
-export interface Take {
-  tempo: number;
-  mult: 0.5 | 1 | 2;
-  mode: Mode;
-  shift: number;
-  loopOn: boolean;
-  loopStart: number;
-  loopBars: 4 | 8 | 16;
-  kick: boolean;
-}
 
 export interface Track {
   /** The YouTube id; null for a file. */
@@ -47,8 +35,6 @@ class Session {
   track = $state<Track | null>(null);
   bands = $state.raw<Analysis['bands'] | null>(null);
   heatmap = $state.raw<number[]>([]);
-  /** The waveform in a few columns, for the crate. */
-  overview = $state.raw<number[]>([]);
 
   // The source, as detected and as corrected.
   srcBpm = $state(120);
@@ -80,9 +66,6 @@ class Session {
   #abort: AbortController | null = null;
   #retry: (() => void) | null = null;
   #taps: number[] = [];
-  #pending: { run: () => void; at: number; from: number } | null = null;
-  /** Called every frame while playing, with the playhead (takes.svelte.ts flips on it). */
-  readonly frame = new Set<(pos: number) => void>();
 
   // ---------------------------------------------------------------------------------------------
   // Loading
@@ -172,7 +155,6 @@ class Session {
     this.track = { ...this.pending!, duration: buffer.duration };
     this.pending = null;
     this.bands = analysis.bands;
-    this.overview = overview(analysis.bands);
     this.heatmap = heatmap;
     this.srcBpm = grid.bpm;
     this.offset = grid.offset;
@@ -297,57 +279,6 @@ class Session {
   hold(on: boolean) {
     this.orig = on;
   }
-
-  // ---------------------------------------------------------------------------------------------
-  // Takes
-
-  /** Runs a change at the next beat while playing, so switching settings never stumbles; at once otherwise. */
-  onBeat(run: () => void) {
-    if (!this.playing) {
-      this.#pending = null;
-      run();
-      return;
-    }
-    const beat = beatLength(this.srcBpm);
-    const next = this.grid.offset + (Math.floor((this.pos - this.grid.offset) / beat) + 1) * beat;
-    this.#pending = { run, at: next, from: this.pos };
-  }
-
-  /** The frame's work: a change waiting for its beat (or a loop that jumped back past it), then the hooks. */
-  tick(pos: number) {
-    const p = this.#pending;
-    if (p && (pos >= p.at || pos < p.from - 0.05)) {
-      this.#pending = null;
-      p.run();
-    }
-    for (const hook of this.frame) hook(pos);
-  }
-
-  current(): Take {
-    return {
-      tempo: this.tempo,
-      mult: this.mult,
-      mode: prefs.mode,
-      shift: Math.round(this.shift * 100) / 100,
-      loopOn: this.loopOn,
-      loopStart: this.loopStart,
-      loopBars: prefs.loopBars,
-      kick: prefs.kick,
-    };
-  }
-
-  applyTake(take: Take) {
-    prefs.mode = take.mode;
-    prefs.kick = take.kick;
-    prefs.loopBars = take.loopBars;
-    this.mult = take.mult;
-    this.tempo = take.tempo;
-    prefs.target = take.tempo;
-    this.manual = take.mode === 'keep' ? take.shift : 0;
-    this.loopStart = take.loopStart;
-    this.loopOn = take.loopOn;
-    if (take.loopOn && (this.pos < this.loopStart || this.pos >= this.loopEnd)) this.seek(this.loopStart);
-  }
 }
 
 export const session = new Session();
@@ -374,7 +305,6 @@ $effect.root(() => {
     let frame = 0;
     const step = () => {
       session.pos = engine.position();
-      session.tick(session.pos);
       const duration = session.track?.duration ?? 0;
       if (!session.loopOn && duration && session.pos >= duration - 0.02) {
         session.pause();
@@ -391,7 +321,7 @@ $effect.root(() => {
     if (session.status !== 'ready' || !track?.id) return;
     const id = track.id;
     const settings = { tempo: session.tempo, shift: session.shift, mode: prefs.mode };
-    const entry = { id, title: track.title, channel: track.channel, ...settings, src: session.srcBpm, key: { ...session.srcKey }, overview: session.overview };
+    const entry = { id, title: track.title, channel: track.channel, ...settings };
     const timer = setTimeout(() => {
       history.replaceState(history.state, '', addressFor(id, settings));
       remember(entry);

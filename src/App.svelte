@@ -13,22 +13,6 @@
   import { prefs, ui, zoomBy } from './lib/prefs.svelte.ts';
   import { session } from './lib/session.svelte.ts';
   import { readAddress } from './lib/share.ts';
-  import { takes } from './lib/takes.svelte.ts';
-  import { formatShift, keyName, transpose } from './lib/music.ts';
-
-  // Without the takes' wing (under 2400 px) the keys still work, and a short note says what happened.
-  const wingsShown = matchMedia('(min-width: 2400px)');
-  const note = (text: string) => {
-    if (!wingsShown.matches) toast(text, { duration: 1600 });
-  };
-
-  function recallTake(i: number, asB: boolean) {
-    const take = takes.list[i];
-    if (!take || !takes.recall(i, asB) || asB) return;
-    const key = transpose(session.srcKey, take.mode === 'resample' ? 12 * Math.log2(take.tempo / (session.srcBpm * take.mult)) : take.shift);
-    const shift = take.mode === 'keep' && Math.abs(take.shift) >= 0.005 ? ` ${formatShift(take.shift)}` : '';
-    note(t('toast.recalled', { n: i + 1, name: `${take.tempo.toFixed(1)} · ${keyName(key)}${shift} · ${take.mode === 'resample' ? t('key.resample') : t('key.keep')}` }));
-  }
 
   // A link with a video in it (?v=…, /watch?v=…, a youtu.be path swapped onto this host) opens it,
   // with the settings it carries.
@@ -93,12 +77,6 @@
     }
     if (session.status !== 'ready') return;
     const big = event.shiftKey;
-    // Takes: 1–9 by the key's place, so shift + 1 still reads as 1 on every layout.
-    const digit = /^Digit([1-9])$/.exec(event.code);
-    if (digit) {
-      event.preventDefault();
-      return recallTake(Number(digit[1]) - 1, big);
-    }
     switch (key) {
       case ' ':
         session.togglePlay();
@@ -139,15 +117,6 @@
       case '+':
       case '=':
         zoomBy(1);
-        break;
-      case 's': {
-        const i = takes.save();
-        if (i === null) toast(t('takes.full'), { tone: 'bad' });
-        else note(t('toast.saved', { n: i + 1 }));
-        break;
-      }
-      case 'b':
-        if (!takes.toggleFlip()) toast(t('takes.needB'));
         break;
       case 't': {
         const bpm = session.tap();

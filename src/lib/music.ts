@@ -96,31 +96,3 @@ export function parseBpm(text: string): number | null {
   const n = parseFloat(text.trim().replace(',', '.'));
   return Number.isFinite(n) && n >= MIN_BPM && n <= MAX_BPM ? n : null;
 }
-
-/** Keys that mix: the same key, a neighbour on the Camelot wheel (a fifth apart), or the relative. */
-export function keysMix(a: Key, b: Key): boolean {
-  const na = camelotNumber(a), nb = camelotNumber(b);
-  if (a.minor !== b.minor) return na === nb;
-  const d = mod(na - nb, 12);
-  return d === 0 || d === 1 || d === 11;
-}
-
-/** A source tempo near a target, read as half or double time when that's closer: within 6 %. */
-export function tempoNear(source: number, target: number, tolerance = 0.06): boolean {
-  const read = source * bestMultiple(source, target);
-  return Math.abs(target / read - 1) <= tolerance;
-}
-
-/** A track's waveform in a few columns, 0–1, for a thumbnail of it (the crate's rows). */
-export function overview(bands: { lo: Float32Array; mi: Float32Array; hi: Float32Array }, columns = 64): number[] {
-  const n = bands.lo.length;
-  const out: number[] = [];
-  for (let c = 0; c < columns; c++) {
-    const a = Math.floor((c / columns) * n), b = Math.max(a + 1, Math.floor(((c + 1) / columns) * n));
-    let sum = 0;
-    for (let i = a; i < b && i < n; i++) sum += 0.6 * bands.lo[i] + 0.5 * bands.mi[i] + 0.3 * bands.hi[i];
-    out.push(sum / (b - a));
-  }
-  const top = Math.max(...out) || 1;
-  return out.map((v) => Math.round((v / top) * 100) / 100);
-}
