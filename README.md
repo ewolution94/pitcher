@@ -12,10 +12,10 @@ Live at [pitcher.ewolution.cloud](https://pitcher.ewolution.cloud).
 - **Detected, then yours.** The source tempo, its beat grid and its key are read in the page. Click
   the tempo to correct it, tap it with `T`, read it as half or double time (picked on its own when
   that's closer), pick another key.
-- **What a session needs.** Hold for the original, loops of 4, 8 or 16 bars, Reset (straight back
-  to the detected tempo and key), and Copy: the numbers for the DAW and a link that opens the same
-  test. On the keys, a kick on every beat at the new tempo (`K`) and Hook, YouTube's most replayed
-  part (`H`).
+- **What a session needs.** Hold for the original, loops of 4, 8 or 16 bars from wherever the
+  playhead is, Reset (straight back to the detected tempo and key), and Copy: the numbers for the
+  DAW and a link that opens the same test. On the keys, a kick on every beat at the new tempo (`K`)
+  and Hook, YouTube's most replayed part (`H`).
 - **Files too.** Drop an MP3, WAV, AAC or FLAC anywhere, open one from the link field, or paste a
   link anywhere on the page.
 - **The family's shell.** English and German, light and dark, installs to the home screen, counts

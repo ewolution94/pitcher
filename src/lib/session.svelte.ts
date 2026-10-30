@@ -4,7 +4,7 @@
 
 import { engine } from './audio/engine.ts';
 import { analyse, type Analysis } from './analysis/protocol.ts';
-import { barAt, barLength, barStart, hookTime } from './analysis/tempo.ts';
+import { barLength, hookTime } from './analysis/tempo.ts';
 import { LocalizedError, msg, toMessage, type Message } from './i18n/message.ts';
 import { bestMultiple, MAX_BPM, MIN_BPM, semitonesOf, transpose, type Key } from './music.ts';
 import { prefs, remember, type Mode } from './prefs.svelte.ts';
@@ -269,8 +269,9 @@ class Session {
     this.pos = at;
   }
 
+  /** The loop starts right where the playhead is, not at its bar: play carries on and comes back here. */
   toggleLoop() {
-    if (!this.loopOn) this.loopStart = Math.max(0, barStart(barAt(this.pos, this.grid), this.grid));
+    if (!this.loopOn) this.loopStart = Math.max(0, this.pos);
     this.loopOn = !this.loopOn;
     if (this.loopOn && (this.pos < this.loopStart || this.pos >= this.loopEnd)) this.seek(this.loopStart);
   }
