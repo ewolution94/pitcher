@@ -17,6 +17,8 @@
   const rate = $derived(session.orig ? 1 : session.ratio);
   const beatPhase = $derived(((session.pos - session.grid.offset) / (60 / session.grid.bpm)) % 1);
   const blink = $derived(prefs.kick && session.playing && beatPhase >= 0 && beatPhase < 0.22);
+  /** The beat the playhead is on: the play button's ring pulses once per beat. */
+  const beatIndex = $derived(Math.floor((session.pos - session.grid.offset) / (60 / session.grid.bpm)));
 
   async function copy() {
     const track = session.track!;
@@ -49,9 +51,10 @@
 <footer class="transport" class:grouped>
   <button type="button" class="play" class:on={session.playing} aria-label={session.playing ? t('transport.pause') : t('transport.play')} onclick={() => session.togglePlay()}>
     {#if session.playing}
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" /></svg>
+      {#key beatIndex}<span class="ring" aria-hidden="true"></span>{/key}
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" /></svg>
     {:else}
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z" /></svg>
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M7.5 4.5v15l12.5-7.5z" /></svg>
     {/if}
   </button>
   <span class="pos">
@@ -90,26 +93,66 @@
     padding: 0 max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left));
   }
 
+  /* The deck's main control: big and filled in the readout's amber, a ring pulsing on the beat while
+     it plays. */
   .play {
+    position: relative;
     flex: none;
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
     display: grid;
     place-items: center;
+    margin-right: 6px;
+    border: 0;
     border-radius: 50%;
-    border: 2px solid var(--ewo-line-strong);
-    background: var(--ewo-bg-raised);
-    color: var(--ewo-fg);
+    background: var(--amber);
+    color: var(--amber-ink);
+    box-shadow: 0 2px 12px var(--amber-soft), inset 0 1px 0 rgb(255 255 255 / 0.25);
+    transition: scale 0.12s ease;
+  }
+
+  .play:hover {
+    background: color-mix(in oklab, var(--amber) 88%, white);
+  }
+
+  .play:active {
+    scale: 0.95;
   }
 
   .play svg {
+    position: relative;
     fill: currentColor;
   }
 
   .play.on {
-    border-color: var(--amber);
-    color: var(--amber-text);
-    box-shadow: 0 0 16px var(--amber-soft);
+    box-shadow: 0 0 22px var(--amber-soft), inset 0 1px 0 rgb(255 255 255 / 0.25);
+  }
+
+  .ring {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 2px solid var(--amber);
+    opacity: 0;
+    animation: beat 0.5s ease-out;
+    pointer-events: none;
+  }
+
+  @keyframes beat {
+    from {
+      opacity: 0.8;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 1.35;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring {
+      display: none;
+    }
   }
 
   .pos {
@@ -150,6 +193,11 @@
 
     .copy {
       margin-left: auto;
+    }
+
+    .play {
+      width: 52px;
+      height: 52px;
     }
   }
 </style>

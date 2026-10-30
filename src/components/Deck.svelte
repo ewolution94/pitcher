@@ -2,13 +2,12 @@
   The deck, once a track is loaded: the track and what was detected, the waveform, then the tempo
   beside the key, and the transport. On a wide screen it fills the window below the header; on a
   narrow one it stacks, with a key row in place of the wheel. From 2000 px wide (an ultrawide) the
-  controls become one centred group: what was detected, the tempo under the playhead with the ruler's
-  needle on the same line, and the key, with the transport in one row beneath. From 2400 px the side
-  space holds two wings: the crate on the left, the takes on the right.
+  controls become one centred group: the tempo under the playhead with the ruler's needle on the same
+  line, the key beside it, and the transport in one row beneath. From 2400 px the side space holds
+  two wings: the crate on the left, the takes on the right.
 -->
 <script lang="ts">
   import Crate from './Crate.svelte';
-  import Detected from './Detected.svelte';
   import Key from './Key.svelte';
   import Takes from './Takes.svelte';
   import Tempo from './Tempo.svelte';
@@ -43,11 +42,10 @@
 </script>
 
 <main class="deck" class:is-orig={session.orig} class:ultra={ultra.matches} class:wings={wings.matches}>
-  <Track detected={!ultra.matches} />
+  <Track />
   <Wave />
   <div class="controls">
     {#if wings.matches}<div class="wing left"><Crate /></div>{/if}
-    {#if ultra.matches}<div class="source"><Detected stacked /></div>{/if}
     <Tempo bind:this={tempo} centred={ultra.matches} />
     <Key wide={wide.matches} />
     <!-- On an ultrawide the transport belongs to the group, right under the tempo. -->
@@ -62,7 +60,7 @@
     --group: 1760px;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 56px minmax(140px, 1fr) 40px auto 60px;
+    grid-template-rows: 56px minmax(140px, 1fr) 40px auto 72px;
     height: calc(100dvh - var(--ewo-bar-h));
     min-height: 620px;
   }
@@ -114,14 +112,15 @@
     padding: 0;
   }
 
-  .ultra .controls > :global(.key) {
-    border-left: 0;
-    align-self: center;
+  /* The left column stays empty, so the tempo's column is centred on the screen. */
+  .ultra .controls > :global(.tempo) {
+    grid-column: 2;
   }
 
-  .source {
-    justify-self: start;
-    padding: 14px 16px;
+  .ultra .controls > :global(.key) {
+    grid-column: 3;
+    border-left: 0;
+    align-self: center;
   }
 
   /* From 2400 px: the group in fixed columns in the middle, a wing either side as tall as the space
@@ -132,11 +131,6 @@
     padding-bottom: 24px;
     grid-template-columns: minmax(0, 1fr) 400px 960px 400px minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr);
-  }
-
-  .wings .controls > .source {
-    grid-column: 2;
-    grid-row: 1;
   }
 
   .wings .controls > :global(.tempo) {
@@ -175,7 +169,7 @@
 
   @media (max-height: 760px) and (min-width: 760px) {
     .deck:not(.ultra) {
-      grid-template-rows: 56px minmax(120px, 1fr) 36px auto 56px;
+      grid-template-rows: 56px minmax(120px, 1fr) 36px auto 68px;
     }
   }
 

@@ -1,14 +1,12 @@
 <!--
   What the analysis found: the source tempo (click to correct it), half and double time (lit when the
   reading picked them on its own), and the key (pick another when it's wrong; a relative major or
-  minor is the usual miss). In the track row, or stacked beside the tempo on a very wide screen.
+  minor is the usual miss). At the end of the track row.
 -->
 <script lang="ts">
   import { t } from '../lib/i18n/index.svelte.ts';
   import { camelot, keyName, MAJOR_KEYS, MINOR_KEYS, parseBpm } from '../lib/music.ts';
   import { session } from '../lib/session.svelte.ts';
-
-  let { stacked = false }: { stacked?: boolean } = $props();
 
   let editing = $state(false);
   let value = $state('');
@@ -31,7 +29,7 @@
   }
 </script>
 
-<div class="detected" class:stacked>
+<div class="detected">
   <span class="label">{t('track.detected')}</span>
   <span class="row">
     <span class="bpm">
@@ -171,27 +169,6 @@
     inset: 0;
     opacity: 0;
     cursor: pointer;
-  }
-
-  /* Beside the tempo: the source as a column, the numbers as big as the ones they lead to. */
-  .stacked {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .stacked .bpm input,
-  .stacked .key b {
-    font-size: clamp(22px, 2.6vh, 34px);
-  }
-
-  .stacked .bpm input {
-    width: 4.6ch;
-  }
-
-  .stacked .key .code {
-    font-size: 15px;
-    font-weight: 600;
   }
 
   @media (max-width: 759.98px) {

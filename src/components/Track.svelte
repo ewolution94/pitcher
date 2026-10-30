@@ -1,12 +1,9 @@
 <!--
-  What's on the deck: the picture, the title and the channel, and what the analysis found (Detected),
-  unless a very wide screen has it beside the tempo.
+  What's on the deck: the picture, the title and the channel, and what the analysis found (Detected).
 -->
 <script lang="ts">
   import Detected from './Detected.svelte';
   import { session } from '../lib/session.svelte.ts';
-
-  let { detected = true }: { detected?: boolean } = $props();
 </script>
 
 <div class="track">
@@ -15,7 +12,7 @@
     <b>{session.track?.title}</b>
     {#if session.track?.channel}<span>{session.track.channel}</span>{/if}
   </div>
-  {#if detected}<div class="end"><Detected /></div>{/if}
+  <div class="end"><Detected /></div>
 </div>
 
 <style>
