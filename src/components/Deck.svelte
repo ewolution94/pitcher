@@ -1,14 +1,15 @@
 <!--
-  The deck, once a track is loaded: the track and what was detected, then the stage, the tempo ruler,
-  the whole track, and the transport. The stage is the waveform, full bleed: the tempo and the key
-  float over it as two readouts. The ruler has a band of its own under it, with room on both sides.
-  On a phone the key's controls get a row of their own under the whole track, and the transport sits
-  in the thumb zone. Wider than a 1080p screen, everything you use keeps to a centred group as wide as
+  The deck, once a track is loaded: the track and what was detected, the whole track, then the stage,
+  the tempo ruler and the transport. The stage is the waveform, full bleed: the tempo and the key
+  float over it as two readouts, and the hold for the original sits at its bottom right. The ruler has
+  a band of its own under it, with room on both sides. On a phone the key's controls get a row of
+  their own under the ruler, and the transport sits in the thumb zone. Wider than a 1080p screen, everything you use keeps to a centred group as wide as
   one, and the waveform runs on at the sides, fading out; on a tall screen the stage stops growing and
   the deck sits in the middle.
 -->
 <script lang="ts">
   import Key from './Key.svelte';
+  import Original from './Original.svelte';
   import Ruler from './Ruler.svelte';
   import Tempo from './Tempo.svelte';
   import Track from './Track.svelte';
@@ -48,6 +49,7 @@
       <Tempo />
       <Key variant={wide.matches ? 'full' : 'readout'} />
     </div>
+    <div class="orig"><Original /></div>
     {#snippet below()}
       <div class="rule"><Ruler /></div>
     {/snippet}
@@ -66,7 +68,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     /* The stage grows with the screen, to a cap: past it the deck keeps its size in the middle. */
-    grid-template-rows: 56px minmax(200px, 54vh) auto auto 112px;
+    grid-template-rows: 56px auto minmax(200px, 54vh) auto 112px;
     align-content: center;
     height: calc(100dvh - var(--ewo-bar-h));
     min-height: 600px;
@@ -96,7 +98,13 @@
 
   .deck > :global(.over) {
     height: 36px;
-    margin: 0 var(--side) 18px;
+    margin: 20px var(--side);
+  }
+
+  .orig {
+    position: absolute;
+    right: var(--side);
+    bottom: 14px;
   }
 
   .hud {
@@ -117,7 +125,7 @@
 
   @media (max-height: 760px) and (min-width: 760px) {
     .deck {
-      grid-template-rows: 52px minmax(160px, 1fr) auto auto 92px;
+      grid-template-rows: 52px auto minmax(160px, 1fr) auto 92px;
     }
 
     .rule {
@@ -127,7 +135,7 @@
 
     .deck > :global(.over) {
       height: 30px;
-      margin-bottom: 12px;
+      margin-block: 14px;
     }
 
     .hud {
@@ -137,7 +145,7 @@
 
   @media (max-width: 759.98px) {
     .deck {
-      grid-template-rows: auto minmax(0, 1fr) auto auto auto auto;
+      grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
     }
 
     .deck > :global(.track) {
@@ -150,8 +158,13 @@
     }
 
     .deck > :global(.over) {
-      height: 26px;
-      margin: 0 max(1rem, env(safe-area-inset-right)) 10px max(1rem, env(safe-area-inset-left));
+      height: 28px;
+      margin: 12px max(1rem, env(safe-area-inset-right)) 12px max(1rem, env(safe-area-inset-left));
+    }
+
+    .orig {
+      right: max(0.75rem, env(safe-area-inset-right));
+      bottom: 10px;
     }
 
     .hud {

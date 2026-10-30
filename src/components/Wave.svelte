@@ -1,11 +1,12 @@
 <!--
-  The waveform, as a deck shows it, and the deck's stage: the lows, mids and highs in their own
-  colours, scrolling past a fixed playhead with the beat grid and bar numbers over it (drag it to jog);
-  what the deck floats over it comes in as children, the waveform keeps `gap` clear above the stage's
-  bottom edge and starts under `ceiling` (where the readouts end) when there's room for it. Then what
-  the deck puts under the stage (`below`), and the whole track, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
-  drag to jump). The zoom is in pixels per beat, so a wider screen shows more bars rather than bigger
-  ones; ⌘ + scroll (or pinch) on the waveform, and − and +, change it.
+  The waveform, as a deck shows it. First the whole track, with YouTube's "most replayed" curve over
+  it, the hook, the loop and the playhead (click or drag to jump). Then the deck's stage: the lows,
+  mids and highs in their own colours, scrolling past a fixed playhead with the beat grid and bar
+  numbers over it (drag it to jog); what the deck floats over it comes in as children, the waveform
+  keeps `gap` clear above the stage's bottom edge and starts under `ceiling` (where the readouts end)
+  when there's room for it. Then what the deck puts under the stage (`below`). The zoom is in pixels
+  per beat, so a wider screen shows more bars rather than bigger ones; ⌘ + scroll (or pinch) on the
+  waveform, and − and +, change it.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
@@ -256,21 +257,6 @@
   }
 </script>
 
-<div class="zoom" bind:clientWidth={zw} bind:clientHeight={zh}>
-  <canvas
-    bind:this={zoom}
-    aria-label={t('wave.label')}
-    class:grabbing
-    onpointerdown={jogStart}
-    onpointermove={jogMove}
-    onpointerup={() => ((jog = null), (grabbing = false))}
-    onpointercancel={() => ((jog = null), (grabbing = false))}
-  ></canvas>
-  {@render children?.()}
-  {#if session.orig}<span class="badge">{t('transport.original')}</span>{/if}
-  <span class="zoomed" class:shown={zoomNote} aria-live="polite">{zoomNote ? t('wave.zoom', { count: bars }) : ''}</span>
-</div>
-{@render below?.()}
 <div class="over" bind:clientWidth={ow} bind:clientHeight={oh}>
   <canvas
     bind:this={over}
@@ -285,6 +271,20 @@
     onpointercancel={() => (scrubbing = false)}
   ></canvas>
 </div>
+<div class="zoom" bind:clientWidth={zw} bind:clientHeight={zh}>
+  <canvas
+    bind:this={zoom}
+    aria-label={t('wave.label')}
+    class:grabbing
+    onpointerdown={jogStart}
+    onpointermove={jogMove}
+    onpointerup={() => ((jog = null), (grabbing = false))}
+    onpointercancel={() => ((jog = null), (grabbing = false))}
+  ></canvas>
+  {@render children?.()}
+  <span class="zoomed" class:shown={zoomNote} aria-live="polite">{zoomNote ? t('wave.zoom', { count: bars }) : ''}</span>
+</div>
+{@render below?.()}
 
 <style>
   .zoom,
@@ -296,7 +296,7 @@
 
   .zoom {
     background: var(--well);
-    border-bottom: 1px solid var(--ewo-line);
+    border-block: 1px solid var(--ewo-line);
   }
 
   canvas {
@@ -342,21 +342,5 @@
 
   .zoomed.shown {
     opacity: 1;
-  }
-
-  .badge {
-    position: absolute;
-    left: 50%;
-    translate: -50% 0;
-    bottom: 10px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: var(--ewo-fg);
-    color: var(--ewo-bg);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    pointer-events: none;
   }
 </style>

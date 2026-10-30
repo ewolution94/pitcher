@@ -1,13 +1,15 @@
 <!--
-  What's on the deck: the picture, the title and the channel, and what the analysis found (Detected).
+  What's on the deck: the picture (a file's tile for a file), the title and the channel, and what the
+  analysis found (Detected).
 -->
 <script lang="ts">
+  import FileMusic from '@lucide/svelte/icons/file-music';
   import Detected from './Detected.svelte';
   import { session } from '../lib/session.svelte.ts';
 </script>
 
 <div class="track">
-  {#if session.track?.thumb}<img class="thumb" src={session.track.thumb} alt="" />{/if}
+  {#if session.track?.thumb}<img class="thumb" src={session.track.thumb} alt="" />{:else}<span class="thumb file" aria-hidden="true"><FileMusic size={20} /></span>{/if}
   <div class="title">
     <b>{session.track?.title}</b>
     {#if session.track?.channel}<span>{session.track.channel}</span>{/if}
@@ -31,6 +33,13 @@
     object-fit: cover;
     border-radius: 4px;
     background: var(--well);
+  }
+
+  .file {
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--ewo-line);
+    color: var(--ewo-fg-2);
   }
 
   .title {

@@ -61,8 +61,8 @@ class Session {
   grid = $derived({ bpm: this.srcBpm, offset: this.offset + this.nudge });
   loopEnd = $derived(this.loopStart + prefs.loopBars * barLength(this.srcBpm));
   targetKey = $derived(transpose(this.srcKey, this.shift));
-  /** At the track's own tempo and key: nothing for Reset to do. */
-  untouched = $derived(Math.abs(this.ratio - 1) < 1e-4 && Math.abs(this.shift) < 0.005);
+  /** At the detected tempo, read as it is, and the detected key: nothing for Reset to do. */
+  untouched = $derived(this.mult === 1 && Math.abs(this.tempo - this.srcBpm) < 0.005 && Math.abs(this.shift) < 0.005);
   hook = $derived(this.track ? hookTime(this.heatmap, this.track.duration, this.grid) : null);
 
   #abort: AbortController | null = null;
@@ -208,10 +208,11 @@ class Session {
     prefs.mode = mode;
   }
 
-  /** Back to the track as it is: its own tempo (in the reading picked) and its own key. */
+  /** Straight back to what Detected shows: its tempo, read as it is (no half or double), and its key. */
   reset() {
+    this.mult = 1;
     this.manual = 0;
-    this.setTempo(this.base, true);
+    this.setTempo(this.srcBpm, true);
   }
 
   setSourceTempo(b: number) {

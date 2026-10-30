@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
   import LinkField from './LinkField.svelte';
-  import { openFile, openRecent } from '../lib/actions.ts';
+  import { AUDIO_FILES, openFile, openRecent } from '../lib/actions.ts';
   import { t, tm } from '../lib/i18n/index.svelte.ts';
   import { formatShift } from '../lib/music.ts';
   import { forget, recent } from '../lib/prefs.svelte.ts';
@@ -57,7 +57,7 @@
       <p class="hint">
         <label class="file">
           {t('start.file')}
-          <input type="file" accept="audio/*,.mp3,.wav,.aif,.aiff,.flac,.m4a,.aac,.ogg,.opus" onchange={picked} />
+          <input type="file" accept={AUDIO_FILES} onchange={picked} />
         </label>
         <span class="drop">· {t('start.drop')}</span>
       </p>

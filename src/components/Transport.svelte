@@ -1,13 +1,11 @@
 <!--
-  The transport, down to what a session uses: where you are (bar.beat, time at the new tempo, the new
-  length) on the left; Loop, Hold for the original, the big play button, the Kick (it lights on the
-  beat) and Hook in the middle; Reset (back to the track's own tempo and key), the loop's length and
-  Copy (the numbers for the DAW and a link back) on the right. On a phone the middle row is the thumb's, the rest goes above it.
+  The transport, down to what a session uses: where you are (bar.beat, the time at the new tempo, the
+  new length), then Loop, the loop's length, the big play button, Reset (straight back to what was
+  detected) and Copy (the numbers for the DAW and a link back). The Kick and Hook stay on their keys
+  (K, H). On a phone where you are sits centred above the buttons, in the thumb's reach.
 -->
 <script lang="ts">
-  import AudioWaveform from '@lucide/svelte/icons/audio-waveform';
-  import CircleDot from '@lucide/svelte/icons/circle-dot';
-  import Flame from '@lucide/svelte/icons/flame';
+  import CopyIcon from '@lucide/svelte/icons/copy';
   import Repeat from '@lucide/svelte/icons/repeat';
   import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
   import { toast } from '../../vendor/ewo/elements/toaster.js';
@@ -19,10 +17,6 @@
   import { summaryText } from '../lib/share.ts';
 
   const rate = $derived(session.orig ? 1 : session.ratio);
-  const beatPhase = $derived(((session.pos - session.grid.offset) / (60 / session.grid.bpm)) % 1);
-  const blink = $derived(prefs.kick && session.playing && beatPhase >= 0 && beatPhase < 0.22);
-  /** The beat the playhead is on: the play button's ring pulses once per beat. */
-  const beatIndex = $derived(Math.floor((session.pos - session.grid.offset) / (60 / session.grid.bpm)));
 
   async function copy() {
     const track = session.track!;
@@ -44,59 +38,37 @@
       toast(t('transport.copyFailed'), { tone: 'bad' });
     }
   }
-
-  function holdStart(event: PointerEvent) {
-    event.preventDefault();
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-    session.hold(true);
-  }
 </script>
 
 <footer class="transport">
   <span class="pos">
     <b>{barBeat(session.pos, session.grid)}</b>
-    <span>{formatTime(session.pos / rate)}</span>
+    <span class="time">{formatTime(session.pos / rate)}</span>
     <span class="len">/ {formatTime((session.track?.duration ?? 0) / rate)}</span>
   </span>
-  <div class="centre">
+  <div class="buttons">
     <button type="button" class="tb" class:on={session.loopOn} aria-pressed={session.loopOn} onclick={() => session.toggleLoop()}>
       <i><Repeat size={19} /></i>{t('transport.loop')}
     </button>
-    <button
-      type="button"
-      class="tb"
-      class:on={session.orig}
-      title={t('transport.holdTitle')}
-      onpointerdown={holdStart}
-      onpointerup={() => session.hold(false)}
-      onpointercancel={() => session.hold(false)}
-      onlostpointercapture={() => session.hold(false)}
-      onkeydown={(e) => (e.key === ' ' || e.key === 'Enter') && !e.repeat && (e.preventDefault(), session.hold(true))}
-      onkeyup={(e) => (e.key === ' ' || e.key === 'Enter') && session.hold(false)}
-    >
-      <i><AudioWaveform size={19} /></i>{t('transport.holdShort')}
+    <button type="button" class="tb" title={t('transport.barsTitle')} onclick={() => session.cycleLoopBars()}>
+      <i class="count">{prefs.loopBars}</i>{t('transport.barsLabel')}
     </button>
-    <button type="button" class="play" class:on={session.playing} aria-label={session.playing ? t('transport.pause') : t('transport.play')} onclick={() => session.togglePlay()}>
-      {#if session.playing}
-        {#key beatIndex}<span class="ring" aria-hidden="true"></span>{/key}
-        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" /></svg>
-      {:else}
-        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7.5 4.5v15l12.5-7.5z" /></svg>
-      {/if}
+    <span class="deck-play">
+      <span class="glow" class:on={session.playing} aria-hidden="true"></span>
+      <button type="button" class="play" class:on={session.playing} aria-label={session.playing ? t('transport.pause') : t('transport.play')} onclick={() => session.togglePlay()}>
+        {#if session.playing}
+          <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" /></svg>
+        {:else}
+          <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7.5 4.5v15l12.5-7.5z" /></svg>
+        {/if}
+      </button>
+    </span>
+    <button type="button" class="tb reset" title={t('transport.resetTitle')} disabled={session.untouched} onclick={() => session.reset()}>
+      <i><RotateCcw size={19} /></i>{t('transport.reset')}
     </button>
-    <button type="button" class="tb" class:on={prefs.kick} class:blink aria-pressed={prefs.kick} title={t('transport.kickTitle')} onclick={() => (prefs.kick = !prefs.kick)}>
-      <i><CircleDot size={19} /></i>{t('transport.kick')}
+    <button type="button" class="tb" title={t('transport.copyTitle')} onclick={copy}>
+      <i><CopyIcon size={18} /></i>{t('transport.copy')}
     </button>
-    <button type="button" class="tb" title={t('transport.hookTitle')} onclick={() => session.jumpToHook()}>
-      <i><Flame size={19} /></i>{t('transport.hook')}
-    </button>
-  </div>
-  <div class="end">
-    <button type="button" class="btn reset" aria-label={t('transport.reset')} title={t('transport.resetTitle')} disabled={session.untouched} onclick={() => session.reset()}>
-      <RotateCcw size={15} /><span class="text">{t('transport.reset')}</span>
-    </button>
-    <button type="button" class="btn bars" title={t('transport.barsTitle')} onclick={() => session.cycleLoopBars()}>{t('transport.bars', { count: prefs.loopBars })}</button>
-    <button type="button" class="btn" title={t('transport.copyTitle')} onclick={copy}>{t('transport.copy')}</button>
   </div>
 </footer>
 
@@ -109,12 +81,17 @@
     min-width: 0;
     padding-inline: var(--side, 1.25rem);
     border-top: 1px solid var(--ewo-line);
+    /* The play button's glow reaches below it; at the screen's bottom edge it stops there. */
+    overflow-y: clip;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   .pos {
     display: flex;
     align-items: baseline;
-    gap: 7px;
+    gap: 8px;
     color: var(--ewo-fg-2);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -122,30 +99,26 @@
 
   .pos b {
     min-width: 3.4ch;
-    font-size: 15px;
-    font-weight: 650;
+    font-size: 20px;
+    font-weight: 700;
     color: var(--ewo-fg);
   }
 
-  .centre {
+  .time {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ewo-fg);
+  }
+
+  .len {
+    font-size: 15px;
+    color: var(--ewo-fg-3);
+  }
+
+  .buttons {
     display: flex;
     align-items: center;
-    gap: 14px;
-  }
-
-  .end {
-    justify-self: end;
-    display: flex;
-    gap: 8px;
-  }
-
-  .bars {
-    color: var(--ewo-fg-2);
-  }
-
-  .reset:disabled {
-    opacity: 0.4;
-    cursor: default;
+    gap: 16px;
   }
 
   /* Round buttons with their name under them, like a player's. */
@@ -172,9 +145,16 @@
     border: 1px solid var(--ewo-line-strong);
     background: var(--ewo-bg-raised);
     color: var(--ewo-fg);
+    font-style: normal;
   }
 
-  .tb:hover i {
+  .tb .count {
+    font-size: 17px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb:hover:not(:disabled) i {
     border-color: var(--ewo-fg-3);
   }
 
@@ -188,25 +168,65 @@
     color: var(--amber-text);
   }
 
-  .tb.blink i {
-    box-shadow: 0 0 10px 2px var(--amber-soft), 0 0 0 1px var(--amber);
+  .tb:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 
-  /* The deck's main control: big and filled in the readout's amber, a ring pulsing on the beat while
-     it plays. */
+  /* The deck's main control: big and filled in the readout's amber; while it plays, a soft glow
+     under it breathes slowly (on its own time, not the track's). */
+  .deck-play {
+    position: relative;
+    display: grid;
+    place-items: center;
+    margin-inline: 6px;
+  }
+
+  .glow {
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--amber) 50%, transparent), transparent);
+    translate: 0 7px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .glow.on {
+    opacity: 0.8;
+    animation: breathe 3.2s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.55;
+      scale: 0.95;
+    }
+    50% {
+      opacity: 0.9;
+      scale: 1.04;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow.on {
+      animation: none;
+    }
+  }
+
   .play {
     position: relative;
-    flex: none;
     width: 64px;
     height: 64px;
     display: grid;
     place-items: center;
-    margin-inline: 6px;
     border: 0;
     border-radius: 50%;
     background: var(--amber);
     color: var(--amber-ink);
-    box-shadow: 0 2px 14px var(--amber-soft), inset 0 1px 0 rgb(255 255 255 / 0.25);
+    box-shadow: 0 2px 10px var(--amber-soft), inset 0 1px 0 rgb(255 255 255 / 0.25);
     transition: scale 0.12s ease;
   }
 
@@ -219,39 +239,7 @@
   }
 
   .play svg {
-    position: relative;
     fill: currentColor;
-  }
-
-  .play.on {
-    box-shadow: 0 0 24px var(--amber-soft), inset 0 1px 0 rgb(255 255 255 / 0.25);
-  }
-
-  .ring {
-    position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    border: 2px solid var(--amber);
-    opacity: 0;
-    animation: beat 0.5s ease-out;
-    pointer-events: none;
-  }
-
-  @keyframes beat {
-    from {
-      opacity: 0.8;
-      scale: 1;
-    }
-    to {
-      opacity: 0;
-      scale: 1.35;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ring {
-      display: none;
-    }
   }
 
   @media (max-height: 760px) and (min-width: 760px) {
@@ -266,37 +254,28 @@
     }
   }
 
-  /* A phone: where you are, the loop's length and Copy in a line, the buttons under it in the thumb's
-     reach, the play button in the middle. */
+  /* A phone: where you are, centred and bold, the buttons under it in the thumb's reach, the play
+     button in the middle. */
   @media (max-width: 759.98px) {
     .transport {
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas: 'pos end' 'centre centre';
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
       gap: 10px;
-      padding: 10px max(1rem, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+      padding: 12px max(1rem, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
       background: var(--ewo-bg-raised);
     }
 
-    .pos {
-      grid-area: pos;
-      min-width: 0;
-      overflow: hidden;
+    .pos b {
+      font-size: 22px;
     }
 
-    .reset {
-      padding: 0 9px;
+    .time,
+    .len {
+      font-size: 16px;
     }
 
-    .reset .text {
-      display: none;
-    }
-
-    .end {
-      grid-area: end;
-    }
-
-    .centre {
-      grid-area: centre;
+    .buttons {
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       justify-items: center;
@@ -307,16 +286,13 @@
       min-width: 0;
     }
 
+    .deck-play {
+      margin: 0;
+    }
+
     .play {
       width: 68px;
       height: 68px;
-      margin: 0;
-    }
-  }
-
-  @media (max-width: 374.98px) {
-    .len {
-      display: none;
     }
   }
 </style>

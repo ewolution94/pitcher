@@ -1,9 +1,10 @@
 <!--
   The link field: paste or type a YouTube address, Enter or Load opens it. Big on the start screen,
-  compact in the header once a track is on the deck.
+  compact in the header once a track is on the deck, with a button to open a file there too.
 -->
 <script lang="ts">
-  import { openText } from '../lib/actions.ts';
+  import FolderOpen from '@lucide/svelte/icons/folder-open';
+  import { AUDIO_FILES, openFile, openText } from '../lib/actions.ts';
   import { t } from '../lib/i18n/index.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
@@ -11,11 +12,19 @@
   let value = $state('');
   let input: HTMLInputElement | undefined = $state();
 
-  // The loaded video's address, so it reads as "what's on the deck"; empty for a file.
+  // The loaded video's address, so it reads as "what's on the deck". Empty for a file, so the field
+  // still reads as a place for a link (the file's name is in the track row).
   $effect(() => {
     const track = session.track;
-    if (!big && track && document.activeElement !== input) value = track.id ? `youtube.com/watch?v=${track.id}` : track.title;
+    if (!big && track && document.activeElement !== input) value = track.id ? `youtube.com/watch?v=${track.id}` : '';
   });
+
+  function picked(event: Event) {
+    const picker = event.currentTarget as HTMLInputElement;
+    const file = picker.files?.[0];
+    if (file) openFile(file);
+    picker.value = '';
+  }
 
   function submit(event: SubmitEvent) {
     event.preventDefault();
@@ -47,6 +56,12 @@
   />
   {#if big}
     <button type="submit" class="load" disabled={!value.trim()}>{t('link.load')}</button>
+  {:else}
+    <label class="open" title={t('link.file')}>
+      <FolderOpen size={16} />
+      <span class="sr">{t('link.file')}</span>
+      <input type="file" accept={AUDIO_FILES} onchange={picked} />
+    </label>
   {/if}
 </form>
 
@@ -108,6 +123,32 @@
 
   .big input::placeholder {
     font-size: 17px;
+  }
+
+  /* Open a file: a round button at the field's end, the picker itself invisible over it. */
+  .open {
+    position: relative;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--ewo-fg-2);
+    cursor: pointer;
+  }
+
+  .open:hover,
+  .open:focus-within {
+    color: var(--ewo-fg);
+    background: var(--ewo-bg-raised);
+  }
+
+  .open input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
   }
 
   .load {

@@ -8,6 +8,9 @@ import { session } from './session.svelte.ts';
 import { readAddress } from './share.ts';
 import { parseTarget } from './yt/url.ts';
 
+/** What the file pickers take. */
+export const AUDIO_FILES = 'audio/*,.mp3,.wav,.aif,.aiff,.flac,.m4a,.aac,.ogg,.opus';
+
 /** Loads whatever YouTube video the text names. False (and a toast) when it names none. */
 export function openText(text: string): boolean {
   const target = parseTarget(text);
