@@ -30,7 +30,7 @@ export const de: Record<MessageKey, string> = {
   'tempo.readAs': 'gelesen als {bpm} ({multiple})',
   'tempo.rough': 'Rau ab ±25 %',
   'tempo.roughTitle': 'So weit gestreckt verschmiert der Klang. Reicht, um eine Idee zu beurteilen.',
-  'tempo.ruler': 'Tempo-Lineal: ziehen oder werfen, ein Genre antippen, um hinzuspringen',
+  'tempo.ruler': 'Tempo-Lineal: ziehen oder werfen, oder ein Tempo antippen, um hinzuspringen',
 
   'key.label': 'Tonart',
   'key.mode': 'Wenn sich das Tempo ändert',

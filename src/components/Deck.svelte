@@ -1,9 +1,11 @@
 <!--
-  The deck, once a track is loaded: the track and what was detected, then the stage, the whole track,
-  and the transport. The stage is the waveform, full bleed: the tempo and the key float over it as two
-  readouts, and the tempo ruler is its bottom edge. On a phone the key's controls get a row of their
-  own under the stage, and the transport sits in the thumb zone. Wider than a 1080p screen, everything
-  you use keeps to a centred group as wide as one, and the waveform runs on at the sides, fading out.
+  The deck, once a track is loaded: the track and what was detected, then the stage, the tempo ruler,
+  the whole track, and the transport. The stage is the waveform, full bleed: the tempo and the key
+  float over it as two readouts. The ruler has a band of its own under it, with room on both sides.
+  On a phone the key's controls get a row of their own under the whole track, and the transport sits
+  in the thumb zone. Wider than a 1080p screen, everything you use keeps to a centred group as wide as
+  one, and the waveform runs on at the sides, fading out; on a tall screen the stage stops growing and
+  the deck sits in the middle.
 -->
 <script lang="ts">
   import Key from './Key.svelte';
@@ -30,11 +32,8 @@
   }
 
   const wide = query('(min-width: 760px)');
-  const short = query('(max-height: 760px)');
-  /** The ruler's height: the stage's bottom edge. Tall on a phone, where it's dragged with a thumb. */
-  const floor = $derived(wide.matches ? (short.matches ? 84 : 96) : 104);
-  /** The room between the waveform and what's above and below it. */
-  const gap = $derived(wide.matches ? (short.matches ? 20 : 28) : 16);
+  /** The room the waveform keeps from the readouts above it and the stage's bottom edge. */
+  const gap = $derived(wide.matches ? 24 : 14);
 
   let hud: HTMLElement | undefined = $state();
   let hudHeight = $state(0);
@@ -44,12 +43,14 @@
 
 <main class="deck" class:is-orig={session.orig}>
   <Track />
-  <Wave {floor} {gap} {ceiling}>
+  <Wave {gap} {ceiling}>
     <div class="hud" bind:this={hud} bind:clientHeight={hudHeight}>
       <Tempo />
       <Key variant={wide.matches ? 'full' : 'readout'} />
     </div>
-    <div class="floor" style:height="{floor}px"><Ruler /></div>
+    {#snippet below()}
+      <div class="rule"><Ruler /></div>
+    {/snippet}
   </Wave>
   {#if !wide.matches}<Key variant="row" />{/if}
   <Transport />
@@ -64,7 +65,9 @@
     --side: max(1.25rem, (100% - var(--group)) / 2);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 56px minmax(0, 1fr) 64px 112px;
+    /* The stage grows with the screen, to a cap: past it the deck keeps its size in the middle. */
+    grid-template-rows: 56px minmax(200px, 54vh) auto auto 112px;
+    align-content: center;
     height: calc(100dvh - var(--ewo-bar-h));
     min-height: 600px;
   }
@@ -81,8 +84,19 @@
     mask-image: var(--fade);
   }
 
+  /* The ruler: a band of its own between the stage and the whole track. */
+  .rule {
+    height: 104px;
+    margin: 22px var(--side);
+    border: 1px solid var(--ewo-line);
+    border-radius: 12px;
+    background: var(--ewo-bg-raised);
+    overflow: hidden;
+  }
+
   .deck > :global(.over) {
-    margin: 14px var(--side);
+    height: 36px;
+    margin: 0 var(--side) 18px;
   }
 
   .hud {
@@ -101,22 +115,19 @@
     pointer-events: auto;
   }
 
-  .floor {
-    position: absolute;
-    left: var(--wing);
-    right: var(--wing);
-    bottom: 0;
-    background: var(--ewo-bg-raised);
-    border-top: 1px solid var(--ewo-line);
-  }
-
   @media (max-height: 760px) and (min-width: 760px) {
     .deck {
-      grid-template-rows: 52px minmax(0, 1fr) 52px 92px;
+      grid-template-rows: 52px minmax(160px, 1fr) auto auto 92px;
+    }
+
+    .rule {
+      height: 92px;
+      margin-block: 14px;
     }
 
     .deck > :global(.over) {
-      margin-block: 10px;
+      height: 30px;
+      margin-bottom: 12px;
     }
 
     .hud {
@@ -126,15 +137,21 @@
 
   @media (max-width: 759.98px) {
     .deck {
-      grid-template-rows: auto minmax(0, 1fr) 34px auto auto;
+      grid-template-rows: auto minmax(0, 1fr) auto auto auto auto;
     }
 
     .deck > :global(.track) {
       padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
     }
 
+    .rule {
+      height: 112px;
+      margin: 12px max(0.75rem, env(safe-area-inset-right)) 12px max(0.75rem, env(safe-area-inset-left));
+    }
+
     .deck > :global(.over) {
-      margin: 5px max(1rem, env(safe-area-inset-right)) 5px max(1rem, env(safe-area-inset-left));
+      height: 26px;
+      margin: 0 max(1rem, env(safe-area-inset-right)) 10px max(1rem, env(safe-area-inset-left));
     }
 
     .hud {

@@ -1,9 +1,9 @@
 <!--
   The waveform, as a deck shows it, and the deck's stage: the lows, mids and highs in their own
   colours, scrolling past a fixed playhead with the beat grid and bar numbers over it (drag it to jog);
-  what the deck floats over it comes in as children, `floor` keeps the bottom edge clear for the ruler
-  (and `gap` above it), and the waveform starts under `ceiling` (where the readouts end) when there's
-  room for it. Then the whole track below, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
+  what the deck floats over it comes in as children, the waveform keeps `gap` clear above the stage's
+  bottom edge and starts under `ceiling` (where the readouts end) when there's room for it. Then what
+  the deck puts under the stage (`below`), and the whole track, with YouTube's "most replayed" curve over it, the hook, the loop and the playhead (click or
   drag to jump). The zoom is in pixels per beat, so a wider screen shows more bars rather than bigger
   ones; ⌘ + scroll (or pinch) on the waveform, and − and +, change it.
 -->
@@ -15,13 +15,12 @@
   import { colours, type Palette } from '../lib/palette.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
-  let { floor = 0, gap = 0, ceiling = 18, children }: { floor?: number; gap?: number; ceiling?: number; children?: Snippet } = $props();
+  let { gap = 0, ceiling = 18, children, below }: { gap?: number; ceiling?: number; children?: Snippet; below?: Snippet } = $props();
 
   /** How far the waveform reaches up and down from its middle at most, so a tall screen shows more
       room around it rather than a giant one. */
   const REACH = 230;
-  /** The least height the waveform keeps above the floor; with less room under the readouts it runs on
-      under them. */
+  /** The least height the waveform keeps; with less room under the readouts it runs on under them. */
   const LEAST = 180;
 
   let zoom: HTMLCanvasElement | undefined = $state();
@@ -80,7 +79,7 @@
     const t0 = pos - span / 2;
     const pps = w / span;
     const top = 18;
-    const bottom = h - floor;
+    const bottom = h;
     const end = bottom - gap;
     const body = Math.max(top, Math.min(ceiling, end - LEAST));
     const cy = (body + end) / 2;
@@ -257,7 +256,7 @@
   }
 </script>
 
-<div class="zoom" style:--floor="{floor}px" bind:clientWidth={zw} bind:clientHeight={zh}>
+<div class="zoom" bind:clientWidth={zw} bind:clientHeight={zh}>
   <canvas
     bind:this={zoom}
     aria-label={t('wave.label')}
@@ -271,6 +270,7 @@
   {#if session.orig}<span class="badge">{t('transport.original')}</span>{/if}
   <span class="zoomed" class:shown={zoomNote} aria-live="polite">{zoomNote ? t('wave.zoom', { count: bars }) : ''}</span>
 </div>
+{@render below?.()}
 <div class="over" bind:clientWidth={ow} bind:clientHeight={oh}>
   <canvas
     bind:this={over}
@@ -327,7 +327,7 @@
   .zoomed {
     position: absolute;
     left: 12px;
-    bottom: calc(var(--floor) + 10px);
+    bottom: 10px;
     padding: 3px 8px;
     border-radius: 4px;
     background: var(--ewo-bg-raised);
@@ -348,7 +348,7 @@
     position: absolute;
     left: 50%;
     translate: -50% 0;
-    bottom: calc(var(--floor) + 10px);
+    bottom: 10px;
     padding: 3px 8px;
     border-radius: 4px;
     background: var(--ewo-fg);

@@ -28,7 +28,7 @@ export const en = {
   'tempo.readAs': 'read as {bpm} ({multiple})',
   'tempo.rough': 'Rough past ±25 %',
   'tempo.roughTitle': 'Stretching this far smears the sound. Fine for judging an idea.',
-  'tempo.ruler': 'Tempo ruler: drag or throw it, tap a genre to jump to it',
+  'tempo.ruler': 'Tempo ruler: drag or throw it, or tap a tempo to jump to it',
 
   'key.label': 'Key',
   'key.mode': 'When the tempo changes',

@@ -54,19 +54,6 @@ export function bestMultiple(source: number, target: number): 0.5 | 1 | 2 {
 export const MIN_BPM = 40;
 export const MAX_BPM = 250;
 
-/** The genre stops on the tempo ruler. */
-export const STOPS: readonly [number, string][] = [
-  [90, 'Hip-hop'],
-  [95, 'Reggaeton'],
-  [113, 'Amapiano'],
-  [124, 'House'],
-  [128, 'Tech house'],
-  [132, 'Techno'],
-  [140, 'Dubstep'],
-  [150, 'Hardstyle'],
-  [174, 'DnB'],
-];
-
 const MINUS = '−';
 
 export function formatSigned(n: number, digits = 0): string {

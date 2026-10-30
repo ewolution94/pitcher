@@ -5,7 +5,8 @@ record (and FL Studio's default) does it. A quick test of a bootleg idea before 
 Live at [pitcher.ewolution.cloud](https://pitcher.ewolution.cloud).
 
 - **The tempo, typed or thrown.** Type a BPM into the big number, or drag the ruler (throw it and it
-  settles on a genre stop: House 124, Techno 132, DnB 174 …). The arrow keys nudge by 0.1 or 1.
+  settles on a tenth, or on the source tempo, its half or its double near one). The arrow keys nudge
+  by 0.1 or 1.
 - **Keep key or Resample.** Keep key (the default) changes the tempo and holds the key; Resample ties
   the pitch to the tempo like a record. The key moves on its own too, with − and +.
 - **Detected, then yours.** The source tempo, its beat grid and its key are read in the page. Click

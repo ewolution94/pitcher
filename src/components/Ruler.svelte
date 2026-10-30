@@ -1,19 +1,19 @@
 <!--
-  The tempo ruler, the stage's bottom edge: BPM slides under a fixed needle. Strobe dots every half BPM, ticks every BPM, the
-  numbers every ten, and the genre stops below. Drag it, or throw it and let it settle (on a stop
-  when it ends near one); a tap on a genre's name jumps there. Sideways scrolling moves it too. The
-  source tempo (and its half and double) is marked, so you see how far you've gone.
+  The tempo ruler, under the stage: BPM slides under a fixed needle. Strobe dots every half BPM, ticks
+  every BPM, the numbers every five and bigger every ten. Drag it, or throw it and let it settle (on
+  the source tempo, its half or its double when it ends near one); a tap jumps there. Sideways
+  scrolling moves it too. The source tempo and its half and double are marked, so you see how far
+  you've gone.
 -->
 <script lang="ts">
   import { t } from '../lib/i18n/index.svelte.ts';
-  import { STOPS } from '../lib/music.ts';
   import { colours, withAlpha } from '../lib/palette.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
   let canvas: HTMLCanvasElement | undefined = $state();
   let w = $state(0), h = $state(0);
   /** Pixels per BPM: more on a phone, where a finger needs the room for a fine move. */
-  const PPB = $derived(w && w < 560 ? 20 : 15);
+  const PPB = $derived(w && w < 560 ? 20 : 18);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   $effect(() => {
@@ -29,51 +29,39 @@
     const tempo = session.tempo;
     const cx = w / 2;
     const lo = tempo - cx / PPB - 3, hi = tempo + cx / PPB + 3;
-    const dotY = h * 0.14, tickY = h * 0.24, numY = h * 0.57;
+    const dotY = h * 0.17, tickY = h * 0.29, numY = h * 0.82;
 
     x.fillStyle = P.dot;
     for (let b = Math.ceil(lo * 2) / 2; b <= hi; b += 0.5) {
       x.beginPath();
-      x.arc(cx + (b - tempo) * PPB, dotY, b % 1 === 0 ? 1.7 : 1.1, 0, Math.PI * 2);
+      x.arc(cx + (b - tempo) * PPB, dotY, b % 1 === 0 ? 2 : 1.3, 0, Math.PI * 2);
       x.fill();
     }
     for (let b = Math.ceil(lo); b <= hi; b++) {
       const px = Math.round(cx + (b - tempo) * PPB);
-      x.globalAlpha = b % 10 === 0 ? 0.9 : b % 5 === 0 ? 0.55 : 0.3;
+      x.globalAlpha = b % 10 === 0 ? 0.9 : b % 5 === 0 ? 0.6 : 0.3;
       x.fillStyle = P['ewo-fg'];
-      x.fillRect(px, tickY, 1, b % 10 === 0 ? h * 0.17 : b % 5 === 0 ? h * 0.11 : h * 0.06);
+      x.fillRect(px, tickY, b % 10 === 0 ? 1.5 : 1, b % 10 === 0 ? h * 0.24 : b % 5 === 0 ? h * 0.15 : h * 0.08);
     }
     x.globalAlpha = 1;
     x.textAlign = 'center';
-    // A taller ruler gets bigger type.
-    const tall = h >= 96;
-    x.font = `650 ${tall ? 13 : 12}px "Archivo Variable", sans-serif`;
-    x.fillStyle = P['ewo-fg-2'];
-    for (let b = Math.ceil(lo / 10) * 10; b <= hi; b += 10) x.fillText(String(b), cx + (b - tempo) * PPB, numY);
-
-    for (const [b, name] of STOPS) {
-      const px = cx + (b - tempo) * PPB;
-      if (px < -60 || px > w + 60) continue;
-      const on = Math.abs(tempo - b) < 0.05;
-      x.fillStyle = on ? P.amber : P['ewo-fg-3'];
-      x.beginPath();
-      x.arc(px, numY + 8, on ? 2.2 : 1.6, 0, Math.PI * 2);
-      x.fill();
-      x.font = `${on ? 700 : 500} ${tall ? 11 : 10}px "Archivo Variable", sans-serif`;
-      x.fillStyle = on ? P.amber : P['ewo-fg-2'];
-      x.fillText(name, px, h * 0.87);
+    for (let b = Math.ceil(lo / 5) * 5; b <= hi; b += 5) {
+      const ten = b % 10 === 0;
+      x.font = ten ? '650 16px "Archivo Variable", sans-serif' : '550 13px "Archivo Variable", sans-serif';
+      x.fillStyle = ten ? P['ewo-fg-2'] : P['ewo-fg-3'];
+      x.fillText(String(b), cx + (b - tempo) * PPB, numY);
     }
 
     x.textAlign = 'left';
-    x.font = '650 9.5px "Archivo Variable", sans-serif';
+    x.font = '650 10.5px "Archivo Variable", sans-serif';
     for (const k of [0.5, 1, 2]) {
       const px = cx + (session.srcBpm * k - tempo) * PPB;
-      if (px < -60 || px > w + 60) continue;
+      if (px < -80 || px > w + 80) continue;
       x.fillStyle = P['ewo-fg'];
       x.beginPath();
-      x.arc(px, dotY, 3.6, 0, Math.PI * 2);
+      x.arc(px, dotY, 4.5, 0, Math.PI * 2);
       x.fill();
-      x.fillText(k === 1 ? 'SOURCE' : k === 2 ? 'SOURCE ×2' : 'SOURCE ÷2', px + 7, dotY + 3.5);
+      x.fillText(k === 1 ? 'SOURCE' : k === 2 ? 'SOURCE ×2' : 'SOURCE ÷2', px + 9, dotY + 4);
     }
 
     const edge = P['ewo-bg-raised'];
@@ -86,19 +74,19 @@
     x.fillRect(0, 0, w, h);
 
     x.fillStyle = P.amber;
-    x.fillRect(cx - 1, 4, 2, numY + 6);
+    x.fillRect(cx - 1, 3, 2, tickY + h * 0.3);
     x.beginPath();
-    x.moveTo(cx - 6, 2);
-    x.lineTo(cx + 6, 2);
-    x.lineTo(cx, 9);
+    x.moveTo(cx - 7, 2);
+    x.lineTo(cx + 7, 2);
+    x.lineTo(cx, 10);
     x.fill();
   });
 
-  /** The nearest stop (a genre, or the source tempo or its half or double) within `tolerance` BPM. */
+  /** The source tempo, its half or its double, if one is within `tolerance` BPM. */
   function stopNear(bpm: number, tolerance: number): number | null {
     let best: number | null = null;
     let distance = tolerance;
-    for (const s of [...STOPS.map((g) => g[0]), session.srcBpm, session.srcBpm * 2, session.srcBpm / 2]) {
+    for (const s of [session.srcBpm, session.srcBpm * 2, session.srcBpm / 2]) {
       const d = Math.abs(s - bpm);
       if (d < distance) {
         distance = d;
@@ -113,7 +101,7 @@
   let throwFrame = 0;
 
   function settle() {
-    const s = stopNear(session.tempo, 0.8);
+    const s = stopNear(session.tempo, 0.6);
     session.setTempo(s ?? Math.round(session.tempo * 10) / 10);
   }
 
@@ -145,7 +133,7 @@
     if (!d.moved) {
       const rect = canvas!.getBoundingClientRect();
       const bpm = session.tempo + (event.clientX - rect.left - rect.width / 2) / PPB;
-      session.setTempo(stopNear(bpm, 2.2) ?? Math.round(bpm * 2) / 2);
+      session.setTempo(stopNear(bpm, 1.5) ?? Math.round(bpm * 2) / 2);
       return;
     }
     if (reduced || Math.abs(d.v) < 3 || performance.now() - d.t > 90) return settle();
