@@ -260,6 +260,8 @@ class Session {
   pause() {
     engine.pause();
     this.playing = false;
+    // Where it stopped, not the last frame's: the next play starts from here.
+    this.pos = engine.position();
   }
 
   seek(t: number) {

@@ -1,7 +1,9 @@
 // Playback: the decoded track in a Signalsmith Stretch node (WebAssembly in an audio worklet), which
-// changes tempo and pitch independently, and a kick drawn on the source's beat grid. The stretch
-// node keeps the playhead itself; changes are merged into its schedule, so leaving out `input`
-// keeps the place (node_modules/signalsmith-stretch: `schedule`).
+// changes tempo and pitch independently, and a kick drawn on the source's beat grid. Changes are
+// merged into the node's schedule, so leaving out `input` keeps the place
+// (node_modules/signalsmith-stretch: `schedule`). The playhead is kept here, from the audio clock
+// and where it was last set: the node's own time reports run ahead of what's heard by its latency
+// while it plays and not when it's paused, which made the waveform jump on every resume.
 
 interface StretchNode extends AudioWorkletNode {
   inputTime: number;
@@ -43,7 +45,7 @@ export class Engine {
   #kickBus: GainNode | null = null;
   #params: Params = { rate: 1, semitones: 0, loop: null };
   #playing = false;
-  /** Where the playhead was at `#anchorTime` (context seconds). */
+  /** Where the playhead was (what's heard) at `#anchorTime` (context seconds). */
   #anchorInput = 0;
   #anchorTime = 0;
   #duration = 0;
@@ -84,10 +86,6 @@ export class Engine {
       const { default: SignalsmithStretch } = await import('signalsmith-stretch');
       this.#node = (await SignalsmithStretch(ctx)) as StretchNode;
       this.#node.connect(this.#master!);
-      await this.#node.setUpdateInterval(0.05, (input) => {
-        this.#anchorInput = input;
-        this.#anchorTime = this.#ctx!.currentTime;
-      });
     }
     await this.#node.dropBuffers();
     const left = buffer.getChannelData(0);
@@ -99,7 +97,7 @@ export class Engine {
     await this.#node.schedule({ active: false, input: 0, ...this.#change() });
   }
 
-  /** The playhead in source seconds, between the node's reports. */
+  /** The playhead in source seconds: where it was set, moved on by the audio clock at the rate. */
   position(): number {
     if (!this.#ctx) return 0;
     let t = this.#anchorInput;
