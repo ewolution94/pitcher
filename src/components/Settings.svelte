@@ -1,6 +1,7 @@
 <!--
   Settings, the family's way (plans/settings-alignment.md): Folio's ewo-sheet, General first with
-  ewo-settings-basics (language, theme), then the tempo's one switch, then, with a keyboard, the keys.
+  ewo-settings-basics (language, theme), then two switches for the tempo and key, then, with a
+  keyboard, the keys.
   Opens from the header's settings button, or with `,`.
 -->
 <script lang="ts">
@@ -58,6 +59,10 @@
       <ewo-switch row checked={prefs.autoMultiple} onchange={(e) => (prefs.autoMultiple = e.detail.checked)}>
         {t('settings.autoMultiple')}
         <span slot="hint">{t('settings.autoMultipleHint')}</span>
+      </ewo-switch>
+      <ewo-switch row checked={prefs.restoreSaved} onchange={(e) => (prefs.restoreSaved = e.detail.checked)}>
+        {t('settings.restoreSaved')}
+        <span slot="hint">{t('settings.restoreSavedHint')}</span>
       </ewo-switch>
     </section>
 

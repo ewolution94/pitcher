@@ -13,12 +13,15 @@ interface Prefs {
   /** Read the source as half or double time on its own when a tempo is set far from it. Off: the
       reading changes only with ½ and 2×, so any tempo can be set (the user, 2026-10-31). */
   autoMultiple: boolean;
+  /** Open links and recent tracks with the tempo, key and mode they were saved with. Off: every
+      track opens at its detected tempo and key (the user, 2026-10-31). */
+  restoreSaved: boolean;
   /** The waveform's zoom, an index into ZOOM. */
   zoom: number;
 }
 
 const KEY = 'pitcher:prefs';
-const DEFAULTS: Prefs = { language: 'system', mode: 'keep', kick: false, loopBars: 8, autoMultiple: false, zoom: 2 };
+const DEFAULTS: Prefs = { language: 'system', mode: 'keep', kick: false, loopBars: 8, autoMultiple: false, restoreSaved: false, zoom: 2 };
 
 /**
  * The waveform's zoom in pixels per beat, so the beat grid looks the same for every track and a wider

@@ -168,12 +168,14 @@ class Session {
     this.detectedKey = key;
     this.altKey = keyAlt;
     this.keySure = keyConfidence;
-    if (settings.mode) prefs.mode = settings.mode;
-    // At the detected tempo, read as it is, unless a link or the recent list says otherwise.
-    const target = clampBpm(settings.tempo ?? grid.bpm);
-    this.mult = settings.mult ?? (prefs.autoMultiple ? bestMultiple(grid.bpm, target) : 1);
+    // At the detected tempo and key, read as it is; a link's or the recent list's own settings only
+    // when that's switched on in Settings.
+    const saved: Settings = prefs.restoreSaved ? settings : {};
+    if (saved.mode) prefs.mode = saved.mode;
+    const target = clampBpm(saved.tempo ?? grid.bpm);
+    this.mult = saved.mult ?? (prefs.autoMultiple ? bestMultiple(grid.bpm, target) : 1);
     this.tempo = target;
-    this.manual = settings.mode === 'resample' ? 0 : (settings.shift ?? 0);
+    this.manual = saved.mode === 'resample' ? 0 : (saved.shift ?? 0);
     this.loopOn = false;
     this.orig = false;
     this.playing = false;

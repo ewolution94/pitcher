@@ -8,7 +8,7 @@
   import { AUDIO_FILES, openFile, openRecent } from '../lib/actions.ts';
   import { t, tm } from '../lib/i18n/index.svelte.ts';
   import { formatShift } from '../lib/music.ts';
-  import { forget, recent } from '../lib/prefs.svelte.ts';
+  import { forget, prefs, recent } from '../lib/prefs.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
   const percent = (p: number) => `${Math.round(p * 100)} %`;
@@ -71,7 +71,8 @@
             <li>
               <button type="button" class="open" onclick={() => openRecent(r)}>
                 <span class="name"><b>{r.title}</b>{#if r.channel}<span>{r.channel}</span>{/if}</span>
-                <span class="set">{r.tempo.toFixed(1)} BPM{#if Math.abs(r.shift) >= 0.005} · {formatShift(r.shift)}{/if}{#if r.mode === 'resample'} · Resample{/if}</span>
+                <!-- Its saved settings only when it opens with them (Settings). -->
+                {#if prefs.restoreSaved}<span class="set">{r.tempo.toFixed(1)} BPM{#if Math.abs(r.shift) >= 0.005} · {formatShift(r.shift)}{/if}{#if r.mode === 'resample'} · Resample{/if}</span>{/if}
               </button>
               <button type="button" class="forget" aria-label="{t('start.forget')}: {r.title}" title={t('start.forget')} onclick={() => forget(r.id)}>×</button>
             </li>
