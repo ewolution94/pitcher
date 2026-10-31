@@ -31,7 +31,7 @@ export function openFile(file: File) {
 }
 
 export function openRecent(r: Recent) {
-  void session.loadVideo(r.id, { tempo: r.tempo, shift: r.shift, mode: r.mode });
+  void session.loadVideo(r.id, { tempo: r.tempo, shift: r.shift, mode: r.mode, mult: r.mult });
 }
 
 /** Files first, then a link among the dropped text. */

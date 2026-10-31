@@ -1,7 +1,8 @@
 <!--
-  What the analysis found: the source tempo (click to correct it), half and double time (lit when the
-  reading picked them on its own), and the key (pick another when it's wrong), with the runner-up one
-  tap away and marked unsure when it's nearly as likely. At the end of the track row.
+  What the analysis found: the source tempo (click to correct it), half and double time (set by hand,
+  or on their own when that's switched on in Settings), and the key (pick another when it's wrong),
+  with the runner-up one tap away and marked unsure when it's nearly as likely. At the end of the
+  track row.
 -->
 <script lang="ts">
   import { t } from '../lib/i18n/index.svelte.ts';

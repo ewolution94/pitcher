@@ -169,16 +169,17 @@ class Session {
     this.altKey = keyAlt;
     this.keySure = keyConfidence;
     if (settings.mode) prefs.mode = settings.mode;
-    const target = clampBpm(settings.tempo ?? prefs.target ?? grid.bpm);
-    this.mult = bestMultiple(grid.bpm, target);
+    // At the detected tempo, read as it is, unless a link or the recent list says otherwise.
+    const target = clampBpm(settings.tempo ?? grid.bpm);
+    this.mult = settings.mult ?? (prefs.autoMultiple ? bestMultiple(grid.bpm, target) : 1);
     this.tempo = target;
     this.manual = settings.mode === 'resample' ? 0 : (settings.shift ?? 0);
     this.loopOn = false;
     this.orig = false;
     this.playing = false;
-    const start = this.hook ?? 0;
-    this.loopStart = start;
-    this.seek(start);
+    // From the start of the track (the hook is a key away: H).
+    this.loopStart = 0;
+    this.seek(0);
     this.status = 'ready';
   }
 
@@ -192,12 +193,12 @@ class Session {
   // ---------------------------------------------------------------------------------------------
   // The test
 
-  /** `keepMultiple`: a drag or a nudge keeps the half/double reading; a typed tempo may change it. */
+  /** `keepMultiple`: a drag or a nudge keeps the half/double reading; a typed tempo may change it, when
+      that's switched on in Settings. */
   setTempo(t: number, keepMultiple = false) {
     const next = clampBpm(t);
-    if (!keepMultiple) this.mult = bestMultiple(this.srcBpm, next);
+    if (!keepMultiple && prefs.autoMultiple) this.mult = bestMultiple(this.srcBpm, next);
     this.tempo = Math.round(next * 100) / 100;
-    prefs.target = this.tempo;
   }
 
   setShift(s: number) {
@@ -222,7 +223,7 @@ class Session {
 
   setSourceTempo(b: number) {
     this.srcBpm = Math.round(clampBpm(b) * 100) / 100;
-    this.mult = bestMultiple(this.srcBpm, this.tempo);
+    if (prefs.autoMultiple) this.mult = bestMultiple(this.srcBpm, this.tempo);
   }
 
   setMultiple(m: 0.5 | 1 | 2) {
@@ -337,7 +338,7 @@ $effect.root(() => {
     const track = session.track;
     if (session.status !== 'ready' || !track?.id) return;
     const id = track.id;
-    const settings = { tempo: session.tempo, shift: session.shift, mode: prefs.mode };
+    const settings = { tempo: session.tempo, shift: session.shift, mode: prefs.mode, mult: session.mult };
     const entry = { id, title: track.title, channel: track.channel, ...settings };
     const timer = setTimeout(() => {
       history.replaceState(history.state, '', addressFor(id, settings));

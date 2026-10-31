@@ -1,7 +1,7 @@
 <!--
   Settings, the family's way (plans/settings-alignment.md): Folio's ewo-sheet, General first with
-  ewo-settings-basics (language, theme), then, with a keyboard, the keys. Opens from the header's
-  settings button, or with `,`.
+  ewo-settings-basics (language, theme), then the tempo's one switch, then, with a keyboard, the keys.
+  Opens from the header's settings button, or with `,`.
 -->
 <script lang="ts">
   import { setLanguage, t } from '../lib/i18n/index.svelte.ts';
@@ -51,6 +51,14 @@
         onlanguage-change={(e) => setLanguage(e.detail.value as Language)}
         ontheme-change={(e) => theme.set(e.detail.value as ThemePreference)}
       ></ewo-settings-basics>
+    </section>
+
+    <section>
+      <h3 class="label">{t('settings.tempo')}</h3>
+      <ewo-switch row checked={prefs.autoMultiple} onchange={(e) => (prefs.autoMultiple = e.detail.checked)}>
+        {t('settings.autoMultiple')}
+        <span slot="hint">{t('settings.autoMultipleHint')}</span>
+      </ewo-switch>
     </section>
 
     {#if !touchOnly}

@@ -2,7 +2,8 @@
   The transport, down to what a session uses: where you are (bar.beat, the time at the new tempo, the
   new length), then Loop, the loop's length, the big play button, Reset (straight back to what was
   detected) and Copy (the numbers for the DAW and a link back). The Kick and Hook stay on their keys
-  (K, H). On a phone where you are sits centred above the buttons, in the thumb's reach.
+  (K, H). On a phone where you are runs across the top, the bar on the left and the time on the right,
+  the buttons under it in the thumb's reach.
 -->
 <script lang="ts">
   import CopyIcon from '@lucide/svelte/icons/copy';
@@ -41,11 +42,10 @@
 </script>
 
 <footer class="transport">
-  <span class="pos">
-    <b>{barBeat(session.pos, session.grid)}</b>
-    <span class="time">{formatTime(session.pos / rate)}</span>
-    <span class="len">/ {formatTime((session.track?.duration ?? 0) / rate)}</span>
-  </span>
+  <div class="pos">
+    <span class="bar"><span class="label">{t('transport.bar')}</span><b>{barBeat(session.pos, session.grid)}</b></span>
+    <span class="clock"><span class="time">{formatTime(session.pos / rate)}</span><span class="len">/ {formatTime((session.track?.duration ?? 0) / rate)}</span></span>
+  </div>
   <div class="buttons">
     <button type="button" class="tb" class:on={session.loopOn} aria-pressed={session.loopOn} onclick={() => session.toggleLoop()}>
       <i><Repeat size={19} /></i>{t('transport.loop')}
@@ -91,10 +91,17 @@
   .pos {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 18px;
     color: var(--ewo-fg-2);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+  }
+
+  .bar,
+  .clock {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
   }
 
   .pos b {
@@ -269,15 +276,20 @@
     }
   }
 
-  /* A phone: where you are, centred and bold, the buttons under it in the thumb's reach, the play
-     button in the middle. */
+  /* A phone: where you are across the top, the bar on the left and the time on the right, the
+     buttons under it in the thumb's reach, the play button in the middle. */
   @media (max-width: 759.98px) {
     .transport {
       grid-template-columns: minmax(0, 1fr);
-      justify-items: center;
-      gap: 10px;
-      padding: 12px max(1rem, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+      gap: 16px;
+      padding: 16px max(1.25rem, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
       background: var(--ewo-bg-raised);
+    }
+
+    .pos {
+      justify-content: space-between;
+      min-width: 0;
+      overflow: hidden;
     }
 
     .pos b {

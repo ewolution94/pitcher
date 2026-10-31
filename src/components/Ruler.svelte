@@ -7,6 +7,7 @@
 -->
 <script lang="ts">
   import { t } from '../lib/i18n/index.svelte.ts';
+  import { MAX_BPM, MIN_BPM } from '../lib/music.ts';
   import { colours, withAlpha } from '../lib/palette.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
@@ -144,7 +145,7 @@
       last = now;
       velocity *= Math.exp(-dt * 4.5);
       session.setTempo(session.tempo + velocity * dt);
-      if (Math.abs(velocity) > 0.8 && session.tempo > 40 && session.tempo < 250) throwFrame = requestAnimationFrame(step);
+      if (Math.abs(velocity) > 0.8 && session.tempo > MIN_BPM && session.tempo < MAX_BPM) throwFrame = requestAnimationFrame(step);
       else settle();
     };
     throwFrame = requestAnimationFrame(step);

@@ -10,14 +10,15 @@ interface Prefs {
   mode: Mode;
   kick: boolean;
   loopBars: 4 | 8 | 16;
-  /** The last target tempo: the next track opens at it, so a session at 140 stays at 140. */
-  target: number | null;
+  /** Read the source as half or double time on its own when a tempo is set far from it. Off: the
+      reading changes only with ½ and 2×, so any tempo can be set (the user, 2026-10-31). */
+  autoMultiple: boolean;
   /** The waveform's zoom, an index into ZOOM. */
   zoom: number;
 }
 
 const KEY = 'pitcher:prefs';
-const DEFAULTS: Prefs = { language: 'system', mode: 'keep', kick: false, loopBars: 8, target: null, zoom: 2 };
+const DEFAULTS: Prefs = { language: 'system', mode: 'keep', kick: false, loopBars: 8, autoMultiple: false, zoom: 2 };
 
 /**
  * The waveform's zoom in pixels per beat, so the beat grid looks the same for every track and a wider
@@ -33,7 +34,11 @@ export function zoomBy(step: number) {
 function load<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
-    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
+    if (!raw) return fallback;
+    const stored = JSON.parse(raw);
+    // Gone since 2026-10-31: a track opened at the last target tempo; now at its own.
+    delete stored.target;
+    return { ...fallback, ...stored };
   } catch {
     return fallback;
   }
@@ -51,6 +56,8 @@ export interface Recent {
   tempo: number;
   shift: number;
   mode: Mode;
+  /** Read as half or double time (1 when neither). */
+  mult?: 0.5 | 1 | 2;
   at: number;
 }
 

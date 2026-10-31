@@ -51,8 +51,9 @@ export function bestMultiple(source: number, target: number): 0.5 | 1 | 2 {
   return best;
 }
 
-export const MIN_BPM = 40;
-export const MAX_BPM = 250;
+/** Any tempo within reason: a 100 BPM track at 300 is the user's call, not ours. */
+export const MIN_BPM = 20;
+export const MAX_BPM = 400;
 
 const MINUS = '−';
 

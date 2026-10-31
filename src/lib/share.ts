@@ -3,12 +3,14 @@
 
 import type { Mode } from './prefs.svelte.ts';
 import { fromUrl } from './yt/url.ts';
-import { formatPercent, formatShift, keyName, transpose, type Key } from './music.ts';
+import { formatPercent, formatShift, keyName, MAX_BPM, MIN_BPM, transpose, type Key } from './music.ts';
 
 export interface Settings {
   tempo?: number;
   shift?: number;
   mode?: Mode;
+  /** The source read as half or double time. */
+  mult?: 0.5 | 1 | 2;
 }
 
 /** A video and its settings from an address: /?v=…&bpm=128&st=1&mode=resample, /watch?v=…, youtu.be paths. */
@@ -17,7 +19,9 @@ export function readAddress(url: URL): { id: string | null; settings: Settings }
   const p = url.searchParams;
   const settings: Settings = {};
   const bpm = Number(p.get('bpm'));
-  if (bpm >= 40 && bpm <= 250) settings.tempo = bpm;
+  if (bpm >= MIN_BPM && bpm <= MAX_BPM) settings.tempo = bpm;
+  const m = Number(p.get('m'));
+  if (m === 0.5 || m === 2) settings.mult = m;
   const st = Number(p.get('st'));
   if (p.has('st') && Number.isFinite(st) && Math.abs(st) <= 12) settings.shift = st;
   const mode = p.get('mode');
@@ -31,8 +35,9 @@ export function readAddress(url: URL): { id: string | null; settings: Settings }
 const round = (n: number, digits: number) => String(Math.round(n * 10 ** digits) / 10 ** digits);
 
 /** The path and query for a video at these settings. */
-export function addressFor(id: string, s: Required<Settings>): string {
+export function addressFor(id: string, s: Required<Omit<Settings, 'mult'>> & Pick<Settings, 'mult'>): string {
   const q = new URLSearchParams({ v: id, bpm: round(s.tempo, 2) });
+  if (s.mult && s.mult !== 1) q.set('m', String(s.mult));
   if (s.mode === 'resample') q.set('mode', 'resample');
   else if (Math.abs(s.shift) >= 0.005) q.set('st', round(s.shift, 2));
   return `/?${q}`;

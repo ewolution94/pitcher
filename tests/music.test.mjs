@@ -70,6 +70,10 @@ test('the address carries the video and its settings, and reads back', () => {
   const back = readAddress(new URL(path, 'https://pitcher.ewolution.cloud'));
   assert.deepEqual(back, { id: '5NV6Rdv1a3I', settings: { tempo: 128, shift: 1 } });
   assert.equal(addressFor('5NV6Rdv1a3I', { tempo: 128, shift: 1.7, mode: 'resample' }), '/?v=5NV6Rdv1a3I&bpm=128&mode=resample');
+  // Read as double time: the link carries it, so it plays at the same speed wherever it's opened.
+  const doubled = addressFor('5NV6Rdv1a3I', { tempo: 174, shift: 0, mode: 'keep', mult: 2 });
+  assert.equal(doubled, '/?v=5NV6Rdv1a3I&bpm=174&m=2');
+  assert.deepEqual(readAddress(new URL(doubled, 'https://x')).settings, { tempo: 174, mult: 2 });
 });
 
 test('YouTube addresses swapped onto Pitcher, and plain YouTube links, name the video', () => {
@@ -77,7 +81,7 @@ test('YouTube addresses swapped onto Pitcher, and plain YouTube links, name the 
   assert.equal(readAddress(new URL('https://youtu.be/5NV6Rdv1a3I?t=30')).id, '5NV6Rdv1a3I');
   assert.equal(readAddress(new URL('https://pitcher.ewolution.cloud/')).id, null);
   assert.equal(readAddress(new URL('https://pitcher.ewolution.cloud/?v=nope')).id, null);
-  assert.deepEqual(readAddress(new URL('https://x/?v=5NV6Rdv1a3I&bpm=999&st=40')).settings, {});
+  assert.deepEqual(readAddress(new URL('https://x/?v=5NV6Rdv1a3I&bpm=999&st=40&m=3')).settings, {});
 });
 
 test('Copy writes the numbers a DAW needs and the link back', () => {
