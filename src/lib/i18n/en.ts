@@ -9,6 +9,12 @@ export const en = {
   'start.file': 'or open an audio file',
   'start.drop': 'Drop a file or a link anywhere.',
   'start.recent': 'Recent',
+  'start.caption': 'The tempo moves, the key stays: that’s Pitcher. Paste a track below to try it on yours.',
+  'start.demo': 'Try it with a demo beat',
+  'start.demoName': 'Pitcher demo beat',
+  'start.held': 'held',
+  'start.ownLink': 'Now paste your own link',
+  'start.preview': 'A preview: a track’s tempo moving from 116 to 128 BPM while its key, F♯ minor, stays.',
   'start.forget': 'Forget',
 
   'loading.resolve': 'Finding the audio…',

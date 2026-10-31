@@ -8,7 +8,7 @@
   import { t } from '../lib/i18n/index.svelte.ts';
   import { session } from '../lib/session.svelte.ts';
 
-  let { big = false, id = 'link' }: { big?: boolean; id?: string } = $props();
+  let { big = false, id = 'link', placeholder }: { big?: boolean; id?: string; placeholder?: string } = $props();
   let value = $state('');
   let input: HTMLInputElement | undefined = $state();
 
@@ -51,7 +51,7 @@
     inputmode="url"
     autocomplete="off"
     spellcheck="false"
-    placeholder={t('link.placeholder')}
+    placeholder={placeholder ?? t('link.placeholder')}
     onfocus={() => input?.select()}
   />
   {#if big}

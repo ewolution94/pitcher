@@ -1,10 +1,11 @@
 <!--
-  Before a track is on the deck: the link field front and centre, a file instead, and the recent
-  tracks with their settings. While loading: what's coming and how far it got. After a failure:
+  Before a track is on the deck: the live preview (what Pitcher does, shown, with a demo beat behind
+  its button), the link field under it, a file instead, and the recent tracks. While loading: what's coming and how far it got. After a failure:
   what went wrong and a way to try again.
 -->
 <script lang="ts">
   import LinkField from './LinkField.svelte';
+  import Preview from './Preview.svelte';
   import { AUDIO_FILES, openFile, openRecent } from '../lib/actions.ts';
   import { t, tm } from '../lib/i18n/index.svelte.ts';
   import { formatShift } from '../lib/music.ts';
@@ -46,8 +47,9 @@
       </div>
     </div>
   {:else}
+    <Preview />
     <div class="lead">
-      <LinkField big id="link-start" />
+      <LinkField big id="link-start" placeholder={t('start.ownLink')} />
       {#if session.status === 'error' && session.error}
         <div class="error" role="alert">
           <span>{tm(session.error)}</span>
@@ -88,8 +90,12 @@
     display: grid;
     align-content: start;
     justify-items: center;
-    gap: 48px;
-    padding: clamp(48px, 16vh, 160px) max(1rem, env(safe-area-inset-right)) 64px max(1rem, env(safe-area-inset-left));
+    gap: 28px;
+    padding: clamp(20px, 6vh, 72px) max(1rem, env(safe-area-inset-right)) 64px max(1rem, env(safe-area-inset-left));
+  }
+
+  .start > .recent {
+    margin-top: 20px;
   }
 
   .lead,

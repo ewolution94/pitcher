@@ -11,6 +11,12 @@ export const de: Record<MessageKey, string> = {
   'start.file': 'oder eine Audiodatei öffnen',
   'start.drop': 'Datei oder Link irgendwo ablegen.',
   'start.recent': 'Zuletzt',
+  'start.caption': 'Das Tempo wandert, die Tonart bleibt: das ist Pitcher. Füg unten einen Track ein und probier’s mit deinem.',
+  'start.demo': 'Demo-Beat ausprobieren',
+  'start.demoName': 'Pitcher-Demo-Beat',
+  'start.held': 'bleibt',
+  'start.ownLink': 'Jetzt deinen Link einfügen',
+  'start.preview': 'Eine Vorschau: Das Tempo eines Tracks wandert von 116 auf 128 BPM, seine Tonart, Fis-Moll, bleibt.',
   'start.forget': 'Vergessen',
 
   'loading.resolve': 'Suche die Audiospur …',
