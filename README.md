@@ -4,15 +4,15 @@ Paste a YouTube link, set a BPM, and hear the track at it: the key held, or resa
 record (and FL Studio's default) does it. A quick test of a bootleg idea before the DAW opens.
 Live at [pitcher.ewolution.cloud](https://pitcher.ewolution.cloud).
 
-- **The tempo, typed or thrown.** Type a BPM into the big number, or drag the ruler (throw it and it
-  settles on a tenth, or on the source tempo, its half or its double near one). The arrow keys nudge
-  by 0.1 or 1.
+- **The tempo, typed or thrown.** Type any BPM from 20 to 400 into the big number, or drag the ruler
+  (throw it and it settles on a tenth, or on the source tempo, its half or its double near one). The
+  arrow keys nudge by 0.1 or 1. A track opens at its start, at its own tempo and key.
 - **Keep key or Resample.** Keep key (the default) changes the tempo and holds the key; Resample ties
   the pitch to the tempo like a record. The key moves on its own too, with − and +.
 - **Detected, then yours.** The source tempo, its beat grid and its key are read in the page. Click
-  the tempo to correct it, tap it with `T`, read it as half or double time (picked on its own when
-  that's closer), pick another key, or tap the runner-up beside it (marked unsure when it's nearly as
-  likely).
+  the tempo to correct it, tap it with `T`, read it as half or double time (by hand; on its own when
+  that's switched on in Settings), pick another key, or tap the runner-up beside it (marked unsure
+  when it's nearly as likely).
 - **What a session needs.** Hold for the original, loops of 4, 8 or 16 bars from wherever the
   playhead is, Reset (straight back to the detected tempo and key), and Copy: the numbers for the
   DAW and a link that opens the same test. On the keys, a kick on every beat at the new tempo (`K`)
