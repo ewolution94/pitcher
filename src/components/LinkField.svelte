@@ -126,8 +126,11 @@
   }
 
   /* Open a file: a round button at the field's end, the picker itself invisible over it. */
+  /* WebKit lays a file input out at its own width whatever the inset, so it reached over the settings
+     button beside it (a tap there opened the file picker): sized and clipped to the circle. */
   .open {
     position: relative;
+    overflow: hidden;
     flex: none;
     width: 28px;
     height: 28px;
@@ -154,7 +157,11 @@
   .open input {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
     opacity: 0;
+    font-size: 0;
     cursor: pointer;
   }
 

@@ -114,6 +114,8 @@
 
   .file {
     position: relative;
+    display: inline-block;
+    overflow: hidden;
     color: var(--ewo-fg-2);
     text-decoration: underline;
     text-decoration-color: var(--ewo-line-strong);
@@ -128,8 +130,11 @@
   .file input {
     position: absolute;
     inset: 0;
-    opacity: 0;
     width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    font-size: 0;
     cursor: pointer;
   }
 
