@@ -6,15 +6,11 @@ export const en = {
   'link.label': 'YouTube link',
   'link.file': 'Open an audio file',
 
+  'start.title': 'Hear any track at a new tempo.',
+  'start.lede': 'Paste a YouTube link or add an audio file. Pitcher finds its tempo and key, then plays it at the BPM you set, with the key held or pitched like a record.',
   'start.file': 'or open an audio file',
   'start.drop': 'Drop a file or a link anywhere.',
   'start.recent': 'Recent',
-  'start.caption': 'The tempo moves, the key stays: that’s Pitcher. Paste a track below to try it on yours.',
-  'start.demo': 'Try it with a demo beat',
-  'start.demoName': 'Pitcher demo beat',
-  'start.held': 'held',
-  'start.ownLink': 'Now paste your own link',
-  'start.preview': 'A preview: a track’s tempo moving from 116 to 128 BPM while its key, F♯ minor, stays.',
   'start.forget': 'Forget',
 
   'loading.resolve': 'Finding the audio…',

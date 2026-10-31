@@ -8,15 +8,11 @@ export const de: Record<MessageKey, string> = {
   'link.label': 'YouTube-Link',
   'link.file': 'Eine Audiodatei öffnen',
 
+  'start.title': 'Hör jeden Track in einem neuen Tempo.',
+  'start.lede': 'Füg einen YouTube-Link oder eine Audiodatei ein. Pitcher erkennt Tempo und Tonart und spielt den Track im BPM, das du einstellst: mit gleicher Tonart oder mitgepitcht wie eine Platte.',
   'start.file': 'oder eine Audiodatei öffnen',
   'start.drop': 'Datei oder Link irgendwo ablegen.',
   'start.recent': 'Zuletzt',
-  'start.caption': 'Das Tempo wandert, die Tonart bleibt: das ist Pitcher. Füg unten einen Track ein und probier’s mit deinem.',
-  'start.demo': 'Demo-Beat ausprobieren',
-  'start.demoName': 'Pitcher-Demo-Beat',
-  'start.held': 'bleibt',
-  'start.ownLink': 'Jetzt deinen Link einfügen',
-  'start.preview': 'Eine Vorschau: Das Tempo eines Tracks wandert von 116 auf 128 BPM, seine Tonart, Fis-Moll, bleibt.',
   'start.forget': 'Vergessen',
 
   'loading.resolve': 'Suche die Audiospur …',

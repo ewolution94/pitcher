@@ -5,7 +5,6 @@ import assert from 'node:assert/strict';
 import { computeBands } from '../src/lib/analysis/bands.ts';
 import { detectGrid, barAt, barStart, barBeat, hookTime } from '../src/lib/analysis/tempo.ts';
 import { detectKey } from '../src/lib/analysis/key.ts';
-import { DEMO_BPM, renderDemo } from '../src/lib/demo.ts';
 import { keyName } from '../src/lib/music.ts';
 
 const RATE = 44100;
@@ -117,14 +116,6 @@ test('the key comes with a runner-up and a confidence', () => {
   assert.deepEqual(result.ranking[0], result.key);
   assert.notDeepEqual(result.ranking[1], result.key);
   assert.ok(result.confidence >= 0 && result.confidence <= 1);
-});
-
-test('the demo beat reads as what the start screen says: 116 BPM, F♯ minor', () => {
-  for (const rate of [32000, 48000]) {
-    const audio = renderDemo(rate);
-    assert.equal(detectGrid(computeBands(audio, rate)).bpm, DEMO_BPM);
-    assert.equal(keyName(detectKey(audio, rate).key), 'F♯m');
-  }
 });
 
 test('bars and beats from the grid', () => {
