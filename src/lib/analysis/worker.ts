@@ -16,7 +16,7 @@ self.onmessage = (event: MessageEvent<AnalysisRequest>) => {
     const response: AnalysisResponse = {
       id,
       ok: true,
-      result: { grid, key: key.key, keyConfidence: key.confidence, bands: { fps: bands.fps, lo: bands.lo, mi: bands.mi, hi: bands.hi } },
+      result: { grid, key: key.key, keyAlt: key.ranking[1], keyConfidence: key.confidence, bands: { fps: bands.fps, lo: bands.lo, mi: bands.mi, hi: bands.hi } },
     };
     (self as unknown as Worker).postMessage(response, [bands.lo.buffer, bands.mi.buffer, bands.hi.buffer]);
   } catch (err) {

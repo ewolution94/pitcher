@@ -11,7 +11,8 @@ Live at [pitcher.ewolution.cloud](https://pitcher.ewolution.cloud).
   the pitch to the tempo like a record. The key moves on its own too, with − and +.
 - **Detected, then yours.** The source tempo, its beat grid and its key are read in the page. Click
   the tempo to correct it, tap it with `T`, read it as half or double time (picked on its own when
-  that's closer), pick another key.
+  that's closer), pick another key, or tap the runner-up beside it (marked unsure when it's nearly as
+  likely).
 - **What a session needs.** Hold for the original, loops of 4, 8 or 16 bars from wherever the
   playhead is, Reset (straight back to the detected tempo and key), and Copy: the numbers for the
   DAW and a link that opens the same test. On the keys, a kick on every beat at the new tempo (`K`)
@@ -43,8 +44,11 @@ Live at [pitcher.ewolution.cloud](https://pitcher.ewolution.cloud).
   cascaded one-pole filters (150 Hz, 2.5 kHz), every 10 ms. The tempo: an onset envelope from the
   bands' energy, its autocorrelation for the neighbourhood, then folding the whole envelope at each
   candidate period (0.01 BPM apart) for the exact tempo and the beat's phase; the downbeat is the
-  beat where the lows rise most. The key: a chromagram (FFT at ~11 kHz, 65 Hz to 2.1 kHz) against
-  the Krumhansl–Kessler profiles.
+  beat where the lows rise most. The key: the spectral peaks from 40 Hz to 3.5 kHz (low-passed, then
+  8192-point frames at ~11 kHz) in a ten-cent histogram, the tuning corrected when it's over 25 cents
+  off, the 12 pitch classes matched against profiles learned from 1392 EDM tracks; the runner-up is
+  kept too. Measured with `npm run eval` on GiantSteps+: 66 % exactly right, 81 % within the best two
+  ([tools/eval/README.md](tools/eval/README.md)).
 - **Playback** (`src/lib/audio/engine.ts`): [Signalsmith Stretch](https://signalsmith-audio.co.uk/code/stretch/)
   (MIT) in an audio worklet does tempo and pitch separately; Resample is the same node with the pitch
   set to the tempo ratio (12 × log2). The kick is a synthesised one, scheduled a little ahead on the
@@ -86,4 +90,5 @@ src/lib/         session.svelte.ts, music.ts, share.ts, prefs, theme, i18n
 src/components/  Header, Start, Deck (Track, Wave as the stage with Tempo, Key and Ruler over it, Transport), Settings
 vendor/ewo/      Folio's tokens and elements (npm run vendor -- pitcher, in Folio)
 tests/           node --test, no browser
+tools/eval/      npm run eval: the key and tempo measured on sets with known answers (local only)
 ```

@@ -23,6 +23,9 @@ export const en = {
   'track.half': 'Read as half time',
   'track.double': 'Read as double time',
   'track.key': 'Detected key: pick another if it’s wrong',
+  'track.alt': 'or {key}',
+  'track.altTitle': 'The next likeliest key: tap to use it',
+  'track.unsure': 'Not sure: {key} is nearly as likely. Tap to use it',
 
   'tempo.label': 'Tempo',
   'tempo.input': 'Target tempo in BPM: type it and press Enter',

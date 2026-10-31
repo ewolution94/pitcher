@@ -25,6 +25,9 @@ export const de: Record<MessageKey, string> = {
   'track.half': 'Als halbes Tempo lesen',
   'track.double': 'Als doppeltes Tempo lesen',
   'track.key': 'Erkannte Tonart: eine andere wählen, falls sie nicht stimmt',
+  'track.alt': 'oder {key}',
+  'track.altTitle': 'Die nächstwahrscheinliche Tonart: antippen, um sie zu nehmen',
+  'track.unsure': 'Unsicher: {key} ist fast genauso wahrscheinlich. Antippen, um sie zu nehmen',
 
   'tempo.label': 'Tempo',
   'tempo.input': 'Zieltempo in BPM: eintippen und Enter drücken',

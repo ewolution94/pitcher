@@ -43,6 +43,9 @@ class Session {
   nudge = $state(0);
   srcKey = $state<Key>({ pc: 9, minor: true });
   detectedKey = $state<Key>({ pc: 9, minor: true });
+  /** The analysis's runner-up, and how sure it was of the detected key (0–1). */
+  altKey = $state<Key>({ pc: 0, minor: false });
+  keySure = $state(1);
 
   // The test.
   mult = $state<0.5 | 1 | 2>(1);
@@ -153,7 +156,7 @@ class Session {
     }
     signal.throwIfAborted();
 
-    const { grid, key } = analysis;
+    const { grid, key, keyAlt, keyConfidence } = analysis;
     this.track = { ...this.pending!, duration: buffer.duration };
     this.pending = null;
     this.bands = analysis.bands;
@@ -163,6 +166,8 @@ class Session {
     this.nudge = 0;
     this.srcKey = key;
     this.detectedKey = key;
+    this.altKey = keyAlt;
+    this.keySure = keyConfidence;
     if (settings.mode) prefs.mode = settings.mode;
     const target = clampBpm(settings.tempo ?? prefs.target ?? grid.bpm);
     this.mult = bestMultiple(grid.bpm, target);

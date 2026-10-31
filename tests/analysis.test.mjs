@@ -93,6 +93,24 @@ test('F♯ minor reads as F♯ minor at 48 kHz too', () => {
   assert.equal(keyName(detectKey(out, rate).key), 'F♯m');
 });
 
+test('an upload 40 cents sharp still reads in its key, the tuning measured', () => {
+  // Am, Dm, Em, Am, every note 40 cents sharp: without the tuning correction it can slip a semitone.
+  const sharp = (freqs) => freqs.map((f) => f * 2 ** (40 / 1200));
+  const audio = chords([triad(57, true), triad(62, true), triad(64, true), triad(57, true)].map(sharp), 12);
+  const result = detectKey(audio, RATE);
+  assert.equal(keyName(result.key), 'Am');
+  assert.ok(Math.abs(result.tuning - 40) < 8, `tuning read as ${result.tuning.toFixed(1)} cents`);
+});
+
+test('the key comes with a runner-up and a confidence', () => {
+  const audio = chords([triad(60, false), triad(65, false), triad(67, false), triad(60, false)], 12);
+  const result = detectKey(audio, RATE);
+  assert.equal(result.ranking.length, 24);
+  assert.deepEqual(result.ranking[0], result.key);
+  assert.notDeepEqual(result.ranking[1], result.key);
+  assert.ok(result.confidence >= 0 && result.confidence <= 1);
+});
+
 test('bars and beats from the grid', () => {
   const g = { bpm: 120, offset: 0.5 };
   assert.equal(barStart(1, g), 0.5);
