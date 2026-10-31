@@ -55,6 +55,13 @@ for (const bpm of [100, 124, 128, 140]) {
   });
 }
 
+for (const bpm of [87, 174]) {
+  test(`an exact ${bpm} BPM reads as a whole tempo (or its half or double), not ${bpm - 0.01}`, () => {
+    const read = detectGrid(computeBands(drumTrack(bpm, 40), RATE)).bpm;
+    assert.ok([bpm, bpm / 2, bpm * 2].includes(read), `read ${read}`);
+  });
+}
+
 test('a fractional tempo stays fractional', () => {
   const grid = detectGrid(computeBands(drumTrack(117.5, 40), RATE));
   assert.ok(Math.abs(grid.bpm - 117.5) < 0.05, `read ${grid.bpm}`);

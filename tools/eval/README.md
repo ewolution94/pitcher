@@ -50,7 +50,10 @@ By confidence, on GiantSteps+: under 0.3 right 41 % (the runner-up makes it 73 %
 0.75 and over 85 %. On FMAK: 42 %, 54 %, 67 %. GiantSteps+ detuned 35 cents sharp: 66.1 % (before
 45.1 %); 45 cents flat, nearly between two semitones: 50.1 % (before 25.1 %). At 44.1 kHz: the same
 as at 48.
-Tempo, unchanged: usable 88.4 % on GiantSteps+, 83.6 % on Beatport (against Beatport's own BPMs).
+Tempo, against Beatport's own BPMs: usable 91.7 % on GiantSteps+ (from 88.4 %), 90.8 % on Beatport
+(from 83.6 %), since the tempos a third away are folded too (drum & bass at 174 had read 116) and the
+fold's scores are smoothed over neighbouring tempos (an exact 87 had read 86.99); Accuracy2 93.7 %
+and 92.4 %. A smoother score (the envelope's first Fourier coefficient) did worse and is left out.
 
 For comparison on GiantSteps+, published (Faraldo's thesis, Table 6.5; their counts differ a little):
 bgate 70.0 %, KeyFinder 68.7 %, Traktor 69.6 %, Mixed In Key 75.7 %.
