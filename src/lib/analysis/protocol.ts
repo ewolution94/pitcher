@@ -13,7 +13,7 @@ export interface Analysis {
   key: Key;
   /** The next likeliest key, offered beside the detected one. */
   keyAlt: Key;
-  /** 0–1: under 0.3 the runner-up is nearly as likely (measured on EDM: right 41 % then, 85 % from 0.75). */
+  /** 0–1: under 0.3 the runner-up is nearly as likely (measured: right about 42 % then; 0.75 and over, 85 % on EDM, 67 % on other music). */
   keyConfidence: number;
   /** The waveform: peaks per band, 0–1, `fps` frames a second. */
   bands: { fps: number; lo: Float32Array; mi: Float32Array; hi: Float32Array };

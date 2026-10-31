@@ -46,8 +46,9 @@ Live at [pitcher.ewolution.cloud](https://pitcher.ewolution.cloud).
   candidate period (0.01 BPM apart) for the exact tempo and the beat's phase; the downbeat is the
   beat where the lows rise most. The key: the spectral peaks from 40 Hz to 3.5 kHz (low-passed, then
   8192-point frames at ~11 kHz) in a ten-cent histogram, the tuning corrected when it's over 25 cents
-  off, the 12 pitch classes matched against profiles learned from 1392 EDM tracks; the runner-up is
-  kept too. Measured with `npm run eval` on GiantSteps+: 66 % exactly right, 81 % within the best two
+  off, the 12 pitch classes matched against profiles learned from 661 songs of many genres with expert
+  keys (FMAK); the runner-up is kept too. Measured with `npm run eval`: 69 % exactly right on EDM
+  (GiantSteps+, 85 % within the best two), 55 % on pop, rock, folk and hip-hop (FMAK)
   ([tools/eval/README.md](tools/eval/README.md)).
 - **Playback** (`src/lib/audio/engine.ts`): [Signalsmith Stretch](https://signalsmith-audio.co.uk/code/stretch/)
   (MIT) in an audio worklet does tempo and pitch separately; Resample is the same node with the pitch

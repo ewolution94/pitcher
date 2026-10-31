@@ -1,22 +1,24 @@
 // The source key: how much of each of the 12 pitch classes sounds over the whole track, compared with
-// a profile of each of the 24 major and minor keys. Measured on EDM with known keys (`npm run eval`,
-// tools/eval/README.md): 66 % exactly right on GiantSteps+, 81 % within the best two, against 45 % and
-// 66 % for the textbook profiles on the plain spectrum this replaced.
+// a profile of each of the 24 major and minor keys. Measured on music with known keys (`npm run eval`,
+// tools/eval/README.md): on EDM (GiantSteps+) 69 % exactly right and 85 % within the best two, on pop,
+// rock, folk and hip-hop (FMAK) 55 %, against 45 % and 42 % for the textbook profiles on the plain
+// spectrum this replaced.
 //
 // The steps: a real low-pass before going down to about 11 kHz (so hi-hat partials can't fold into
 // the notes); 8192-point frames, half overlapping, from 40 Hz to 3.5 kHz; only spectral peaks that
 // stand clear of their surroundings count (noise and cymbals don't), each at its true frequency in a
 // histogram of ten-cent steps; every frame counts by its share, not its loudness; the track's tuning
 // read off the histogram and corrected when it's clearly off (over 25 cents), so a sped-up upload
-// still reads right; then the 12 pitch classes, matched against profiles learned from 1392 EDM tracks
-// of known key (the Beatport EDM Key Dataset, Faraldo et al., CC BY-SA 4.0).
+// still reads right; then the 12 pitch classes, matched against profiles learned from 661 songs of
+// many genres with expert keys (FMAK, Free Music Archive, CC BY 4.0). Learned from EDM instead
+// (the Beatport EDM Key Dataset) they did no better on EDM and worse on everything else.
 
 import { fft } from './fft.ts';
 import type { Key } from '../music.ts';
 
-/** Learned: the average pitch-class profile of the major and the minor tracks, the tonic first. */
-const MAJOR = [1, 0.2365, 0.4927, 0.2197, 0.5868, 0.3774, 0.2426, 0.7927, 0.2283, 0.421, 0.267, 0.4057];
-const MINOR = [1, 0.293, 0.4377, 0.4533, 0.3735, 0.4259, 0.2605, 0.762, 0.2998, 0.2835, 0.4769, 0.3089];
+/** Learned: the average pitch-class profile of the major and the minor songs, the tonic first. */
+const MAJOR = [1, 0.2642, 0.6144, 0.3077, 0.7723, 0.4826, 0.3544, 0.9493, 0.2766, 0.5714, 0.2848, 0.5877];
+const MINOR = [1, 0.2544, 0.5588, 0.6335, 0.3226, 0.5566, 0.2854, 0.9034, 0.3614, 0.3361, 0.5856, 0.3361];
 
 const SIZE = 8192;
 const HOP = SIZE / 2;

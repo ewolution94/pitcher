@@ -1,7 +1,8 @@
 // The ground truth of the sets the evaluation knows, keyed by the track's id (the number its files
-// start with): GiantSteps+ (600 EDM excerpts, keys revised by an expert, modal labels) and the
-// Beatport EDM Key Dataset (1486 excerpts), both from Zenodo under CC BY-SA 4.0, unpacked into
-// ../datasets next to the repo; or a CSV of file,key,bpm[,genre].
+// start with): GiantSteps+ (600 EDM excerpts, keys revised by an expert, modal labels), the Beatport
+// EDM Key Dataset (1486 excerpts), both CC BY-SA 4.0, and FMAK (keys for 5489 Free Music Archive
+// songs of 17 genres, CC BY 4.0, the audio under each artist's licence), all from Zenodo, unpacked
+// into ../datasets next to the repo; or a CSV of file,key,bpm[,genre].
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, extname, join } from 'node:path';
@@ -57,6 +58,18 @@ export function loadTruth(set, data) {
     }
     return { truth, audio: join(dir, 'audio') };
   }
+  if (set === 'fmak') {
+    // The FMA's files are named by the six-digit track id; genres.json holds each track's top genre
+    // (tools/eval/README.md says how it's made).
+    const dir = join(data, 'fmak');
+    const genres = existsSync(join(dir, 'genres.json')) ? json(join(dir, 'genres.json')) : {};
+    const lines = readFileSync(join(dir, 'fma_keys_metadata.csv'), 'utf8').trim().split('\n').slice(1);
+    for (const line of lines) {
+      const [id, , key] = line.split(',');
+      truth.set(id.padStart(6, '0'), { key: key || null, bpm: null, genre: genres[id] ?? '' });
+    }
+    return { truth, audio: join(dir, 'audio') };
+  }
   if (set.startsWith('csv:')) {
     const lines = readFileSync(set.slice(4), 'utf8').trim().split('\n').slice(1);
     for (const line of lines) {
@@ -65,7 +78,7 @@ export function loadTruth(set, data) {
     }
     return { truth, audio: null };
   }
-  throw new Error(`Unknown set: ${set} (giantsteps, beatport or csv:<file>)`);
+  throw new Error(`Unknown set: ${set} (giantsteps, beatport, fmak or csv:<file>)`);
 }
 
 export { idOf };
