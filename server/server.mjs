@@ -1,6 +1,7 @@
 // Production server: serves the built page from ../dist, the relay to YouTube (relay.mjs, Fermata's)
-// and the Census forwarder. No dependencies and no state: the audio is fetched through the relay,
-// decoded and played in the page, and kept nowhere.
+// and the Census forwarder, and puts Dashboard's defaults into the page (Folio's config-server; the
+// manifest is public/ewo.config.json). No dependencies and no state: the audio is fetched through the
+// relay, decoded and played in the page, and kept nowhere.
 //
 //   PORT=8080 HOST=0.0.0.0 node server/server.mjs
 //
@@ -8,6 +9,8 @@
 //   PORT, HOST          where to listen (default 0.0.0.0:8080)
 //   PITCHER_IPV4=1      only talk to YouTube over IPv4 (stream URLs are bound to the IP that asked)
 //   PITCHER_CENSUS      Census's ingest origin for visit counts, e.g. http://census:4901 (default: off)
+//   DASHBOARD_URL       Dashboard's apps' port for the family's defaults, e.g. http://dashboard:8081
+//                       (default: off, so the built-in ones: today's)
 
 import dns from 'node:dns';
 import http from 'node:http';
@@ -19,6 +22,7 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { createCensus } from './census.mjs';
 import { createRelay } from './relay.mjs';
+import { createConfig } from '../vendor/ewo/elements/config-server.js';
 
 const portFlag = process.argv.indexOf('--port');
 const PORT = Number(portFlag > -1 ? process.argv[portFlag + 1] : (process.env.PORT ?? 8080));
@@ -82,6 +86,29 @@ const census = createCensus({ target: process.env.PITCHER_CENSUS ?? '', site: 'p
 const relay = createRelay();
 const compressed = new Map();
 
+// Dashboard's values for this app (the language and theme a device that hasn't picked starts
+// from), checked against the manifest. Until Dashboard answers, and whenever it's down, the
+// built-in ones: the page as it ships. Never part of /healthz.
+const config = createConfig({
+  manifest: JSON.parse(await readFile(path.join(DIST, 'ewo.config.json'), 'utf8')),
+  url: process.env.DASHBOARD_URL ?? '',
+});
+config.start();
+
+// The page carries the values, so its bodies are kept for the current values only.
+let pages = { etag: '', bodies: new Map() };
+async function page(entry, encoding) {
+  if (pages.etag !== config.etag()) pages = { etag: config.etag(), bodies: new Map() };
+  const key = `${entry.mtime.getTime()}:${encoding ?? 'identity'}`;
+  let body = pages.bodies.get(key);
+  if (!body) {
+    const raw = Buffer.from(config.inject(await readFile(entry.file, 'utf8')));
+    body = encoding === 'br' ? zlib.brotliCompressSync(raw) : encoding === 'gzip' ? zlib.gzipSync(raw) : raw;
+    pages.bodies.set(key, body);
+  }
+  return body;
+}
+
 async function resolveFile(pathname) {
   let decoded;
   try {
@@ -119,6 +146,15 @@ async function serveStatic(req, res) {
 
   const accept = req.headers['accept-encoding'] ?? '';
   const encoding = /\bbr\b/.test(accept) ? 'br' : /\bgzip\b/.test(accept) ? 'gzip' : null;
+
+  // The page carries Dashboard's values (#ewo-config, a data block the CSP allows).
+  if (entry.file === path.join(DIST, 'index.html')) {
+    const body = await page(entry, encoding);
+    res.writeHead(200, { ...headers, 'content-length': body.length, vary: 'accept-encoding', ...(encoding && { 'content-encoding': encoding }) });
+    res.end(req.method === 'HEAD' ? undefined : body);
+    return;
+  }
+
   if (encoding && COMPRESSIBLE.has(ext) && entry.size < 8 * 1024 * 1024) {
     const key = `${entry.file}:${entry.mtime.getTime()}:${encoding}`;
     let body = compressed.get(key);

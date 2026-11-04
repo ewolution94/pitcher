@@ -10,14 +10,15 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# The server has zero dependencies, so the runtime image is just Node + the built app.
-# Pitcher keeps no state on the server: the audio passes through the relay to the page, and the
-# recent tracks live on each device.
+# The server has zero dependencies, so the runtime image is just Node + the built app, plus
+# Folio's config helper (Dashboard's defaults). Pitcher keeps no state on the server: the audio
+# passes through the relay to the page, and the recent tracks live on each device.
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production PORT=8080 TZ=Europe/Berlin
 COPY --from=build /app/dist ./dist
 COPY server ./server
+COPY vendor/ewo/elements/config-server.js vendor/ewo/elements/config-core.js ./vendor/ewo/elements/
 COPY package.json ./
 USER node
 EXPOSE 8080

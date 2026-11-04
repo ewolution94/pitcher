@@ -79,6 +79,7 @@ A push to `release` runs the checks (`ci.yml`) and publishes `ghcr.io/ewolution9
 | `HOST` | `0.0.0.0` | |
 | `PITCHER_CENSUS` | off | Census's ingest origin (`http://census:4901` on the `ewolution` network). |
 | `PITCHER_IPV4` | off | `1` pins IPv4 towards YouTube, should a dual-stack host get 403s. |
+| `DASHBOARD_URL` | off | Dashboard's apps' port (`http://dashboard:8081` on the NAS): the language and theme a device that hasn't picked starts from (the family's, or Pitcher's own). Off or down: the built-in ones, as before. |
 
 ## Project layout
 
